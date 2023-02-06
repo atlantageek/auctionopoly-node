@@ -1,10 +1,11 @@
 const express = require('express');
+const redis = require("ioredis")
 require("dotenv").config();
 const session = require('express-session');
 const redisStore = require('connect-redis')(session);
 const bodyParser = require('body-parser');
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
-const redis = require('redis');
+const ACCOUNT_NAMESPACE='account:'
 
 
 const app = express();
@@ -22,18 +23,21 @@ const REDIS_PORT = process.env.REDIS_PORT;
 
 
 //create the redis client
-const redisClient = redis.createClient({
-    host: 'localhost',
-    port: REDIS_PORT
-})
-redisClient.on('error', function (err) {
-    console.log('Could not establish a connection with redis. ' + err);
-});
-redisClient.on('connect', function (err) {
-    console.log('Connected to redis successfully');
-});
+// const redisClient = redis.createClient({
+//     host: 'localhost',
+//     port: REDIS_PORT
+// })
+// redisClient.on('error', function (err) {
+//     console.log('Could not establish a connection with redis. ' + err);
+// });
+// redisClient.on('connect', function (err) {
+//     console.log('Connected to redis successfully');
+// });
 
-redisClient.connect().catch(console.error)
+// redisClient.connect().catch(console.error)
+
+//create the ioredis client
+const redisClient = new redis();
 
 
 const sessionStore = new redisStore({ client: redisClient });
@@ -100,7 +104,7 @@ app.get('/home', redirectLogin, async (req, res) => {
     console.log(email);
     if (email) {
         try {
-            redisClient.hgetall(email, function (err, obj) {
+            redisClient.hgetall(ACCOUNT_NAMESPACE + email, function (err, obj) {
 
                 console.log(obj)
                 //req.user = obj;
@@ -164,7 +168,7 @@ app.post('/login', redirectHome, async (req, res, next) => {
         console.log("LOGIN")
         const email = req.body.email;
         let password = req.body.password;
-        let obj = await redisClient.hGetAll(email)
+        let obj = await redisClient.hgetall(ACCOUNT_NAMESPACE + email)
 
 
         if (!obj) {
@@ -218,7 +222,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
 
         console.log("HSET")
         console.log(redisClient)
-        let result = await redisClient.hSet(email,{
+        let result = await redisClient.hset('account:'+email,{
             'first_name': firstName,
             'last_name': lastName,
             'email': email,
