@@ -13,6 +13,11 @@ class Property extends Card{
     property_price=0
     property_mortgage_value=0;
 }
+property_list=[
+    {
+        group_id:0,
+    }
+]
 
 class Game {
     const
