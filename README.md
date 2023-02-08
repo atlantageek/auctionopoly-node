@@ -19,3 +19,10 @@ Other possible rule changes.
 - The player that lands on a property gets 10% of the auction price as a finder's fee. (or a 10% discount if they win the bid)
 - Pay a fee to keep properties mortgaged.
 - Do not collect rent while in jail.
+
+## Current files
+- game.js - Main game object under development.  Will handle rules and track state of game.
+- b.js - crap code testing redis connection
+- server.js - Eventually will be the host of the game.  Currently a barebones login and user management screen.
+- ws-server.js - Testing websockets.
+- index.html - pairs with ws-server.js to test web sockets.
