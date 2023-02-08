@@ -91,9 +91,9 @@ class Property extends Card {
 
 
 class Game {
-    const
+    turn=0;
     player_list = [];
-    player_position = [];
+    player_positions = [];
     board = [];
     constructor() {
     }
@@ -116,10 +116,68 @@ class Game {
         }
 
     }
-    setPlayers(player1, player2, player3, player4) {
-        let plist = [player1, player2, player3, player4];
-        //randomize players;
-        this.player_list = plist.sort(() => (Math.random() > 0.5) ? 1 : -1);
+    nextTurn() {
+        this.turn++;
     }
+    setPlayers(player1, player2, player3, player4) {
+        this.player_list = [player1, player2, player3, player4];
+        this.player_positions = [0,0,0,0];
+        //randomize players;
+        //this.randomizePlayers();
+    }
+    getPropertyIdx(property_id) {
+        let property_idx = this.board.findIndex(t=>t.id==property_id)
+        
+        return property_idx;
+    }
+    getProperty(property_id) {
+        let property_idx = this.getPropertyIdx(property_id)
+        let p= this.board[property_idx];
+        return p;
+    }
+    assignOwnership(owner_id, property_id) {
+        let property_idx=this.getPropertyIdx(property_id)
+        this.board[property_idx].ownedBy=owner_id;
+    }
+    randomizePlayers() {
+        this.player_list = this.player_list.sort(() => (Math.random() > 0.5) ? 1 : -1);
+    }
+    getCurrentPlayer(){
+        let pos = this.turn % this.player_list.length;
+        return this.player_list[pos];
+    }
+    getIdsByGroup(groupName) {
+        let groupList =this.board.filter(p=>p.group==groupName).map(p=>p.id);
+        return groupList;
+    }
+    checkGroupOwnership(player_id, group_name) {
+        return this.getIdsByGroup(group_name).reduce((allOwned, property_id) => {
+            
+            let property = this.getProperty(property_id);
+            return allOwned && property.ownedBy==player_id;
+        },true)
+    }
+    countGroupOwnership(player_id, group_name) {
+        return this.getIdsByGroup(group_name).reduce((cnt, property_id) => {
+            
+            let property = this.getProperty(property_id);
+            return property.ownedBy==player_id ? cnt+1:cnt;
+        },0)
+    }
+    getPlayerPosition(player_id) {
+        let player_idx =this.player_list.findIndex(p=>p==player_id);
+        return this.player_positions[player_idx];
+    }
+    setPlayerPosition(player_id,pos) {
+        let player_idx =this.player_list.findIndex(p=>p==player_id);
+        this.player_positions[player_idx] = pos;
+    }
+    moveBy(player_id,cnt) {
+        let player_idx =this.player_list.findIndex(p=>p==player_id);
+        let pos = this.player_positions[player_idx];
+        pos=(pos+cnt) % 40;
+        this.player_positions[player_idx]=pos
+    }
+
 }
 module.exports = Game
