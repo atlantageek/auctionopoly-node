@@ -1,6 +1,6 @@
-#Auctionopoly
+# Auctionopoly
 
-##Run Tests
+## Run Tests
 - Download code
 - npm install
 - npm test
