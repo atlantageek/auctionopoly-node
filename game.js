@@ -150,6 +150,7 @@ class Game {
         let groupList =this.board.filter(p=>p.group==groupName).map(p=>p.id);
         return groupList;
     }
+    //Full group ownership doubles rent.  Also decides if we can build houses on property.
     checkGroupOwnership(player_id, group_name) {
         return this.getIdsByGroup(group_name).reduce((allOwned, property_id) => {
             
@@ -157,6 +158,8 @@ class Game {
             return allOwned && property.ownedBy==player_id;
         },true)
     }
+
+    //Used to calculate rent for Utilities and Railroads
     countGroupOwnership(player_id, group_name) {
         return this.getIdsByGroup(group_name).reduce((cnt, property_id) => {
             
