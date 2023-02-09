@@ -83,7 +83,7 @@ class Property extends Card {
             if (owned_in_group == 2) return last_dice_roll * 10;
         }
 
-        if ((group == "Purple" || group == "darkblue") && owned_in_group == 2) return this._rent * 2;
+        if ((this.group == "Purple" || this.group == "darkblue") && owned_in_group == 2) return this._rent * 2;
         if (owned_in_group == 3) return this._rent * 3;
         else return this._rent;
     }
@@ -158,7 +158,14 @@ class Game {
             return allOwned && property.ownedBy==player_id;
         },true)
     }
-
+    getRent(property_id,roll) {
+                let property = this.getProperty(property_id)
+                
+                let owner=property.ownedBy;
+                if (owner == -1 || owner == null) return 0;
+                let owner_cnt = this.countGroupOwnership(owner,property.group);
+                return property.current_rent(owner_cnt,roll)
+             }
     //Used to calculate rent for Utilities and Railroads
     countGroupOwnership(player_id, group_name) {
         return this.getIdsByGroup(group_name).reduce((cnt, property_id) => {

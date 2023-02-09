@@ -93,4 +93,51 @@ describe('#game()', function() {
       expect(game.getPlayerPosition(9)).to.equal(11)
     })
   })
+  context('Test rent',() => {
+    it('Try Group rent', async()=> {
+      let game = new Game();
+      await game.initialize();
+      game.setPlayers(7,9,11,13)
+      game.assignOwnership(7,'boardwalk');
+      let cnt = game.countGroupOwnership(7,'darkblue');
+      expect(cnt).to.equal(1);
+      let rent=game.getRent('boardwalk',3);
+      expect(rent).to.equal(50);
+      game.assignOwnership(9,'parkplace');
+      rent=game.getRent('parkplace',3);
+      expect(rent).to.equal(35);
+      game.assignOwnership(7,'parkplace');
+      expect(game.countGroupOwnership(7,'darkblue')).to.equal(2)
+      rent=game.getRent('parkplace',3);
+      
+      expect(rent).to.equal(70);
+      game.assignOwnership(1,'parkplace');
+
+      //Railroads
+      game.assignOwnership(7,'readingrailroad');
+      game.assignOwnership(7,'pennsylvaniarailroad');
+      game.assignOwnership(7,'shortlinerailroad');
+      rent=game.getRent('shortlinerailroad',3);
+      expect(rent).to.equal(100);
+
+      //Utilities
+      rent=game.getRent('electriccompany',3);
+      expect(rent).to.equal(0);
+      game.assignOwnership(7,'electriccompany');
+      rent=game.getRent('electriccompany',3);
+      expect(rent).to.equal(12);
+      game.assignOwnership(7,'waterworks');
+      rent=game.getRent('electriccompany',3);
+      expect(rent).to.equal(30);
+      
+    })
+  })
+  // context('Test Ownership of group',() => {
+  //   it('Try Group test', async()=> {
+  //   let game = new Game();
+  //   await game.initialize();
+  //   game.assignOwnership(7,'boardwalk');
+  //   expect(game.checkGroupOwnership(7,'darkblue')).to.equal(false);
+  //   });
+  // })
 })
