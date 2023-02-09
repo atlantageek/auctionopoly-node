@@ -1,3 +1,4 @@
+"use strict";
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 class Card {
@@ -30,7 +31,7 @@ class Property extends Card {
     ];
     _housecost = 0;
     _group = "";
-    _ownedby = -1;
+    _owned_by  = -1;
     _mortgaged = false;
     _probability = 2.1314;
 
@@ -42,8 +43,8 @@ class Property extends Card {
     get group() { return this._group; }
     get housecount() { return this._house_count; }
     set housecount(cnt) { this._house_count = cnt }
-    get owned_by() { return this._ownedby }
-    set owned_by(owner) { this.ownedby = owner }
+    get owned_by() { return this._owned_by }
+    set owned_by(owner) { this._owned_by = owner }
     get mortgage_value() { return this._price / 2 }
 
 
@@ -137,7 +138,7 @@ class Game {
     }
     assignOwnership(owner_id, property_id) {
         let property_idx=this.getPropertyIdx(property_id)
-        this.board[property_idx].ownedBy=owner_id;
+        this.board[property_idx].owned_by=owner_id;
     }
     randomizePlayers() {
         this.player_list = this.player_list.sort(() => (Math.random() > 0.5) ? 1 : -1);
@@ -151,17 +152,19 @@ class Game {
         return groupList;
     }
     //Full group ownership doubles rent.  Also decides if we can build houses on property.
-    checkGroupOwnership(player_id, group_name) {
-        return this.getIdsByGroup(group_name).reduce((allOwned, property_id) => {
-            
-            let property = this.getProperty(property_id);
-            return allOwned && property.ownedBy==player_id;
-        },true)
-    }
+        checkGroupOwnership(group_name) {
+                let owner_list= this.getIdsByGroup(group_name).map(property_id =>{
+                    let p=this.getProperty(property_id);
+                    return p.owned_by
+                })
+                if (owner_list.length==0) return false;
+                console.log(owner_list)
+                return !!owner_list.reduce((a, b)=>((a === b) ? a : NaN));
+            }
     getRent(property_id,roll) {
                 let property = this.getProperty(property_id)
                 
-                let owner=property.ownedBy;
+                let owner=property.owned_by;
                 if (owner == -1 || owner == null) return 0;
                 let owner_cnt = this.countGroupOwnership(owner,property.group);
                 return property.current_rent(owner_cnt,roll)
@@ -171,7 +174,7 @@ class Game {
         return this.getIdsByGroup(group_name).reduce((cnt, property_id) => {
             
             let property = this.getProperty(property_id);
-            return property.ownedBy==player_id ? cnt+1:cnt;
+            return property.owned_by==player_id ? cnt+1:cnt;
         },0)
     }
     getPlayerPosition(player_id) {

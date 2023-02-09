@@ -1,3 +1,4 @@
+"use strict"
 var Game = require('../game.js');
 var expect = require('chai').expect;
 
@@ -29,7 +30,7 @@ describe('#game()', function() {
       game.setPlayers(1,2,3,4);
       game.assignOwnership(2,'boardwalk');
       let property = game.getProperty('boardwalk');
-      expect(property.ownedBy).to.equal(2);
+      expect(property.owned_by).to.equal(2);
     })
   })
   context('get properties by group',() => {
@@ -52,9 +53,9 @@ describe('#game()', function() {
       game.setPlayers(1,2,3,4)
       game.assignOwnership(3,'boardwalk');
       game.assignOwnership(1,'parkplace');
-      expect(game.checkGroupOwnership(3,'darkblue')).to.equal(false)
+      expect(game.checkGroupOwnership('darkblue')).to.equal(false)
       game.assignOwnership(3,'parkplace');
-      expect(game.checkGroupOwnership(3,'darkblue')).to.equal(true)
+      expect(game.checkGroupOwnership('darkblue')).to.equal(true)
     })
   })
   context('count properties  group ownership',() => {
@@ -132,12 +133,16 @@ describe('#game()', function() {
       
     })
   })
-  // context('Test Ownership of group',() => {
-  //   it('Try Group test', async()=> {
-  //   let game = new Game();
-  //   await game.initialize();
-  //   game.assignOwnership(7,'boardwalk');
-  //   expect(game.checkGroupOwnership(7,'darkblue')).to.equal(false);
-  //   });
-  // })
+  context('Test Ownership of group',() => {
+    it('Try Group test', async()=> {
+    let game = new Game();
+    await game.initialize();
+    game.assignOwnership(7,'boardwalk');
+    expect(game.checkGroupOwnership('darkblue')).to.equal(false);
+    game.assignOwnership(9,'parkplace');
+    expect(game.checkGroupOwnership('darkblue')).to.equal(false);
+    game.assignOwnership(9,'boardwalk');
+    expect(game.checkGroupOwnership('darkblue')).to.equal(true);
+    });
+  })
 })
