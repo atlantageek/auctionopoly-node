@@ -26,3 +26,5 @@ Other possible rule changes.
 - server.js - Eventually will be the host of the game.  Currently a barebones login and user management screen.
 - ws-server.js - Testing websockets.
 - index.html - pairs with ws-server.js to test web sockets.
+
+All functions will go through Game object.

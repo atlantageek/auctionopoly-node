@@ -163,4 +163,6 @@ describe('#game()', function() {
     expect(result).to.equal(false);
     });
   })
+  //TODO Add tests for player movements and rolling die
+  //TODO Add test to verify player_id part of game.
 })

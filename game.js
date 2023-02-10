@@ -191,6 +191,7 @@ class Game {
         let pos = this.player_positions[player_idx];
         pos=(pos+cnt) % 40;
         this.player_positions[player_idx]=pos
+        return pos;
     }
     addHouse(property_id){
         let p= this.getProperty(property_id);
@@ -206,6 +207,17 @@ class Game {
         if(p.house_count > min_count) return false;
         if (p.house_count >=5) return false;
         return p.add_house();
+    }
+
+    #TODO 
+    //Roll 1 or 2 die
+    rollDie(die_count){
+        //die_count 1 or 2
+        return -1;
+    }
+    rollPlayerDie(player_id,die_count) {
+        let move_count = this.rollDie(die_count);
+        this.moveBy(player_id, move_count)
     }
 }
 module.exports = Game
