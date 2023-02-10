@@ -29,7 +29,8 @@ class Property extends Card {
         160,
         250
     ];
-    _housecost = 0;
+    _house_count=0;
+  
     _group = "";
     _owned_by  = -1;
     _mortgaged = false;
@@ -41,8 +42,8 @@ class Property extends Card {
     get price() { return this._price; }
     get base_rent() { return this._rent; }
     get group() { return this._group; }
-    get housecount() { return this._house_count; }
-    set housecount(cnt) { this._house_count = cnt }
+    get house_count() { return this._house_count || 0; }
+    set house_count(cnt) { this._house_count = cnt }
     get owned_by() { return this._owned_by }
     set owned_by(owner) { this._owned_by = owner }
     get mortgage_value() { return this._price / 2 }
@@ -64,8 +65,8 @@ class Property extends Card {
     }
 
 
-    addhouse() {
-        if (this._house_count > 5) return false;
+    add_house() {
+        if (this._house_count >= 5) return false;
         this._house_count++;
         return true;
     }
@@ -158,7 +159,7 @@ class Game {
                     return p.owned_by
                 })
                 if (owner_list.length==0) return false;
-                console.log(owner_list)
+
                 return !!owner_list.reduce((a, b)=>((a === b) ? a : NaN));
             }
     getRent(property_id,roll) {
@@ -191,6 +192,20 @@ class Game {
         pos=(pos+cnt) % 40;
         this.player_positions[player_idx]=pos
     }
-
+    addHouse(property_id){
+        let p= this.getProperty(property_id);
+        if (!this.checkGroupOwnership(p.group)) return false
+        let house_counts = this.getIdsByGroup(p.group).map(pid =>{
+            p=this.getProperty(pid)
+            return p.house_count
+        })
+        console.log(house_counts)
+        let min_count = Math.min(...house_counts);
+        let max_count = Math.max(...house_counts);
+        console.log(min_count,max_count,p.house_count)
+        if(p.house_count > min_count) return false;
+        if (p.house_count >=5) return false;
+        return p.add_house();
+    }
 }
 module.exports = Game

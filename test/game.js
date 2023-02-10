@@ -145,4 +145,22 @@ describe('#game()', function() {
     expect(game.checkGroupOwnership('darkblue')).to.equal(true);
     });
   })
+  context('Test adding houses',() => {
+    it('Try Group test', async()=> {
+    let game = new Game();
+    await game.initialize();
+    game.assignOwnership(9,'parkplace');
+    let result = game.addHouse('parkplace');
+    expect(result).to.equal(false);
+    game.assignOwnership(9,'boardwalk');
+    result = game.addHouse('parkplace');
+    expect(result).to.equal(true);
+    result = game.addHouse('parkplace');
+    expect(result).to.equal(false);
+    result = game.addHouse('parkplace');
+    expect(result).to.equal(false);
+    result = game.addHouse('boardwalk');
+    expect(result).to.equal(false);
+    });
+  })
 })
