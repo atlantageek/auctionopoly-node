@@ -100,6 +100,8 @@ class Game {
     turn=0;
     player_list = [];
     player_positions = [];
+    player_wallets =[];
+    player_in_jail=[];
     board = [];
     constructor() {
     }
@@ -128,10 +130,14 @@ class Game {
     setPlayers(player1, player2, player3, player4) {
         this.player_list = [player1, player2, player3, player4];
         this.player_positions = [0,0,0,0];
+        this.player_wallets = [1500,1500,1500,1500];
+        this.player_injail = [false,false,false,false]
         //randomize players;
         //this.randomizePlayers();
     }
-
+    getPlayerIdx(player_id) {
+        return this.player_list.findIndex(p=>p==player_id);
+    }
     getPropertyIdx(property_id) {
         let property_idx = this.board.findIndex(t=>t.id==property_id)
         
@@ -184,7 +190,7 @@ class Game {
         },0)
     }
     getPlayerPosition(player_id) {
-        let player_idx =this.player_list.findIndex(p=>p==player_id);
+        let player_idx =this.getPlayerIdx(player_id);
         if (player_idx==-1) return null;
         return this.player_positions[player_idx];
     }
@@ -241,6 +247,44 @@ class Game {
         let move_count = this.rollDie(die_count);
         let property_id=this.moveBy(player_id, move_count)
         return property_id;
+    }
+    getWallet(player_id){
+        let player_idx=this.getPlayerIdx(player_id);
+        return this.player_wallets[player_idx]
+    }
+    inJail(player_id){
+        let player_idx=this.getPlayerIdx(player_id);
+        return this.player_in_jail[player_idx]
+    }
+    sendPlayerToJail(player_id) {
+        let player_idx=this.getPlayerIdx(player_id);
+        this.setPlayerPosition(player_id,10);
+        this.player_in_jail[player_idx]=true;
+    }
+    //This does everything. 
+    //*rolls dice, move player, accounting, trigger random cards.
+    doMove(player_id,move_count) {
+        //let property_id = this.rollPlayerDie(player_id, die_count);
+        let property_idx=this.moveBy(player_id, move_count);
+        let pos = this.getPlayerPosition(player_id);
+        let player_idx=this.getPlayerIdx(player_id);
+        if (pos<move_count) {
+            this.player_wallets[player_idx] += 200;
+        }
+        let property_id = this.board[pos].id;
+        if (property_id == 'gotojail'){
+            this.sendPlayerToJail(player_id)
+            return;
+        }
+    
+        // if (property_id=='chance'){
+        //     return;
+        // }
+        // else if (property_id=='communitychest') {
+        //     return;
+        // }
+        // else 
+
     }
     //Ability to apply a card
     //Move to static function positions (go to jail etc.)

@@ -225,15 +225,30 @@ describe('#game()', function () {
   })
 
   context('Player Position testing',() => {
-    it('noneixtant player should return null;',async()=> {
+    it('Cross go and get 200 added to wallet',async()=> {
       let game = new Game();
       await game.initialize();
-      console.log("XXXX")
-      game.getPlayerPosition(5);
-      // expect(game.getPlayerPosition(5)).to.equal(null);
-      // game.setPlayers(1,2,3,4);
-
+      game.setPlayers(1,2,3,4);
+      game.getPlayerPosition(4);
+      expect(game.getPlayerPosition(5)).to.equal(null);
+      expect(game.getPlayerPosition(1)).to.equal(0)
+      game.setPlayerPosition(1,39);
+      expect(game.getPlayerPosition(1)).to.equal(39)
+      game.doMove(1,1)
+      expect(game.getPlayerPosition(1)).to.equal(0)
+      expect(game.getWallet(1)).to.equal(1700)
+    })
+    it('Land on owned property get wallet deducted.',async()=> {
+    })
+    it('Land on go to jail square.',async()=> {
+      let game = new Game();
+      await game.initialize();
+      game.setPlayers(1,2,3,4);
+      game.doMove(1,30)
+      expect(game.getPlayerPosition(1)).to.equal(10)
+      expect(game.inJail(1)).to.equal(true);
+    })
+    it('Move three spaces back card',async()=> {
     })
   })
-  //TODO Add test to verify player_id part of game.
 })
