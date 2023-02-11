@@ -70,7 +70,11 @@ class Property extends Card {
         this._house_count++;
         return true;
     }
-
+    remove_house() {
+        if (this._house_count <= 0) return false;
+        this._house_count--;
+        return true;
+    }
     current_rent(owned_in_group, last_dice_roll = 0) {
         if (this.mortgaged) return 0;
         if (this.house_count > 0 && this._multipliedrent != null) return this._multipliedrent[housecount - 1];
@@ -127,6 +131,7 @@ class Game {
         //randomize players;
         //this.randomizePlayers();
     }
+
     getPropertyIdx(property_id) {
         let property_idx = this.board.findIndex(t=>t.id==property_id)
         
@@ -180,6 +185,7 @@ class Game {
     }
     getPlayerPosition(player_id) {
         let player_idx =this.player_list.findIndex(p=>p==player_id);
+        if (player_idx==-1) return null;
         return this.player_positions[player_idx];
     }
     setPlayerPosition(player_id,pos) {
@@ -194,21 +200,33 @@ class Game {
         return pos;
     }
     addHouse(property_id){
-        let p= this.getProperty(property_id);
-        if (!this.checkGroupOwnership(p.group)) return false
-        let house_counts = this.getIdsByGroup(p.group).map(pid =>{
-            p=this.getProperty(pid)
+        let target_p= this.getProperty(property_id);
+        if (!this.checkGroupOwnership(target_p.group)) return false
+        let house_counts = this.getIdsByGroup(target_p.group).map(pid =>{
+            let p=this.getProperty(pid)
             return p.house_count
         })
-        console.log(house_counts)
+       
         let min_count = Math.min(...house_counts);
         let max_count = Math.max(...house_counts);
-        console.log(min_count,max_count,p.house_count)
-        if(p.house_count > min_count) return false;
-        if (p.house_count >=5) return false;
-        return p.add_house();
+        
+        if (target_p.house_count > min_count) return false;
+        if (target_p.house_count >=5) return false;
+        return target_p.add_house();
     }
-
+    removeHouse(property_id){
+        let target_p= this.getProperty(property_id);
+        if (!this.checkGroupOwnership(target_p.group)) return false
+        let house_counts = this.getIdsByGroup(target_p.group).map(pid =>{
+            let p=this.getProperty(pid)
+            return p.house_count
+        })
+        let min_count = Math.min(...house_counts);
+        let max_count = Math.max(...house_counts);
+        if (target_p.house_count < max_count) return false;
+        if (target_p.house_count <=0) return false;
+        return target_p.remove_house();
+    }
     #TODO 
     //Roll 1 or 2 die
     rollDie(die_count){
@@ -224,5 +242,7 @@ class Game {
         let property_id=this.moveBy(player_id, move_count)
         return property_id;
     }
+    //Ability to apply a card
+    //Move to static function positions (go to jail etc.)
 }
 module.exports = Game
