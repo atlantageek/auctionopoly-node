@@ -164,5 +164,28 @@ describe('#game()', function() {
     });
   })
   //TODO Add tests for player movements and rolling die
+  context('Test rolling die',() => {
+    it('One die', async()=> {
+    let game = new Game();
+    let rolls=[];
+    let total=0;
+    for (let i=0;i<100;i++) {
+      rolls[i]=game.rollDie(1)
+      total += rolls[i];
+    }
+    expect(Math.min(...rolls)).to.equal(1)
+    expect(Math.max(...rolls)).to.equal(6)
+    expect(total/100).to.approximately(3.5,1)
+    total=0;
+    for (let i=0;i<100;i++) {
+      rolls[i]=game.rollDie(2)
+      total += rolls[i];
+    }
+    expect(Math.min(...rolls)).to.equal(2)
+    expect(Math.max(...rolls)).to.equal(12)
+    expect(total/100).to.approximately(7,1)
+  })
+  
+})
   //TODO Add test to verify player_id part of game.
 })

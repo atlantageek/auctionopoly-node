@@ -213,11 +213,16 @@ class Game {
     //Roll 1 or 2 die
     rollDie(die_count){
         //die_count 1 or 2
-        return -1;
+        let result = Math.floor(Math.random()*6)+1;
+        if (die_count == 2){
+            result+= Math.floor(Math.random()*6)+1;
+        }
+        return result;
     }
     rollPlayerDie(player_id,die_count) {
         let move_count = this.rollDie(die_count);
-        this.moveBy(player_id, move_count)
+        let property_id=this.moveBy(player_id, move_count)
+        return property_id;
     }
 }
 module.exports = Game
