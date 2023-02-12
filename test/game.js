@@ -11,6 +11,8 @@ describe('#game()', function () {
 
       expect(game.board.length).to.equal(40)
       expect(game.board[39].id).to.equal('boardwalk')
+      expect(game.community_chest.length).to.equal(16)
+      expect(game.chance.length).to.equal(15);
     })
   })
   context('add players', () => {
@@ -249,6 +251,11 @@ describe('#game()', function () {
       expect(game.inJail(1)).to.equal(true);
     })
     it('Move three spaces back card',async()=> {
+    })
+  })
+  context('Apply Community chest and chance cards',() => {
+    it('Apply move cards',async() => {
+      
     })
   })
 })
