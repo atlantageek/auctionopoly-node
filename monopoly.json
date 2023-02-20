@@ -908,11 +908,6 @@
         "tileid": "boardwalk"
       },
       {
-        "title": "You have been elected Chairman of the Board - Pay each player $50",
-        "action": "removefundstoplayers",
-        "amount": 50
-      },
-      {
         "title": "Your building loan matures - Collect $150",
         "action": "addfunds",
         "amount": 50
@@ -948,11 +943,6 @@
         "title": "Go to Jail - Go directly to jail - Do not pass Go - Do not collect $200",
         "action": "jail",
         "subaction": "goto"
-      },
-      {
-        "title": "Grand Opera Night - Collect $50 from every player for opening night seats",
-        "action": "addfundsfromplayers",
-        "amount": 50
       },
       {
         "title": "Holiday Fund matures - Receive $100",

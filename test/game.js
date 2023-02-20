@@ -3,11 +3,14 @@ var Game = require('../game.js');
 var expect = require('chai').expect;
 
 describe('#game()', function () {
-
+  let game=null;
+  beforeEach(async () => {
+    game = new Game();
+    await game.initialize();
+  });
   context('default object', () => {
     it('should return 40', async () => {
-      let game = new Game();
-      await game.initialize();
+
 
       expect(game.board.length).to.equal(40)
       expect(game.board[39].id).to.equal('boardwalk')
@@ -17,8 +20,7 @@ describe('#game()', function () {
   })
   context('add players', () => {
     it('should return 4 players', async () => {
-      let game = new Game();
-      await game.initialize();
+
       game.setPlayers(1, 2, 3, 4);
       expect(game.player_list.length).to.equal(4)
       for (let i = 0; i < 17; i++) game.nextTurn();
@@ -27,8 +29,7 @@ describe('#game()', function () {
   })
   context('assign ownership', () => {
     it('should return 4 players', async () => {
-      let game = new Game();
-      await game.initialize();
+
       game.setPlayers(1, 2, 3, 4);
       game.assignOwnership(2, 'boardwalk');
       let property = game.getProperty('boardwalk');
@@ -37,8 +38,7 @@ describe('#game()', function () {
   })
   context('get properties by group', () => {
     it('Try to get all railroads', async () => {
-      let game = new Game();
-      await game.initialize();
+
       let idList = game.getIdsByGroup('Railroad');
       expect(idList.length).to.equal(4);
       expect(idList[0]).to.equal('readingrailroad');
@@ -50,8 +50,6 @@ describe('#game()', function () {
   context('verifyOwnership', () => {
     //Will be used to test whether we can add a house to a property.
     it('Try ownership of darkblue group', async () => {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(1, 2, 3, 4)
       game.assignOwnership(3, 'boardwalk');
       game.assignOwnership(1, 'parkplace');
@@ -63,8 +61,6 @@ describe('#game()', function () {
   context('count properties  group ownership', () => {
     it('Test ownershipCount', async () => {
       //Will be used in calculating rent on railroads and utilitiles
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(1, 2, 3, 4)
       game.assignOwnership(3, 'readingrailroad');
       game.assignOwnership(1, 'pennsylvaniarailroad');
@@ -83,20 +79,14 @@ describe('#game()', function () {
   })
   context('Moving Player by increments', () => {
     it('Check player existance', async() => {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(7, 9, 11, 13)
       expect(game.getPlayerPosition(1)).to.equal(null)
     })
     it('Check player who has not yet moved', async() => {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(7, 9, 11, 13)
       expect(game.getPlayerPosition(7)).to.equal(0)
     })
     it('Move Player around board', async () => {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(7, 9, 11, 13)
       expect(game.getPlayerPosition(9)).to.equal(0)
       game.setPlayerPosition(9, 3)
@@ -110,8 +100,6 @@ describe('#game()', function () {
   })
   context('Test rent', () => {
     it('Try Group rent', async () => {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(7, 9, 11, 13)
       game.assignOwnership(7, 'boardwalk');
       let cnt = game.countGroupOwnership(7, 'darkblue');
@@ -149,8 +137,6 @@ describe('#game()', function () {
   })
   context('Test Ownership of group', () => {
     it('Try Group test', async () => {
-      let game = new Game();
-      await game.initialize();
       game.assignOwnership(7, 'boardwalk');
       expect(game.checkGroupOwnership('darkblue')).to.equal(false);
       game.assignOwnership(9, 'parkplace');
@@ -161,8 +147,6 @@ describe('#game()', function () {
   })
   context('Test manipulating houses', () => {
     it('Try adding House', async () => {
-      let game = new Game();
-      await game.initialize();
       game.assignOwnership(9, 'parkplace');
       let result = game.addHouse('parkplace');
       expect(result).to.equal(false);
@@ -176,8 +160,6 @@ describe('#game()', function () {
       expect(result).to.equal(true);
     });
     it('Try removing house', async () => {
-      let game = new Game();
-      await game.initialize();
       game.assignOwnership(9, 'parkplace');
       let result = game.addHouse('parkplace');
       expect(result).to.equal(false);
@@ -199,7 +181,6 @@ describe('#game()', function () {
   //TODO Add tests for player movements and rolling die
   context('Test rolling die', () => {
     it('One die', async () => {
-      let game = new Game();
       let rolls = [];
       let total = 0;
       for (let i = 0; i < 100; i++) {
@@ -228,8 +209,6 @@ describe('#game()', function () {
 
   context('Player Position testing',() => {
     it('Cross go and get 200 added to wallet',async()=> {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(1,2,3,4);
       game.getPlayerPosition(4);
       expect(game.getPlayerPosition(5)).to.equal(null);
@@ -243,8 +222,6 @@ describe('#game()', function () {
     it('Land on owned property get wallet deducted.',async()=> {
     })
     it('Land on go to jail square.',async()=> {
-      let game = new Game();
-      await game.initialize();
       game.setPlayers(1,2,3,4);
       game.doMove(1,30)
       expect(game.getPlayerPosition(1)).to.equal(10)
@@ -255,7 +232,82 @@ describe('#game()', function () {
   })
   context('Apply Community chest and chance cards',() => {
     it('Apply move cards',async() => {
-      
+      game.setPlayers(1,2,3,4);
+      expect(game.getWallet(1)).to.equal(1500)
+      game.activateMoveCard(1, 'go')
+      expect(game.getWallet(1)).to.equal(1700)
+      expect(game.getPlayerPosition(1)).to.equal(0)
+      game.activateMoveCard(1, 'boardwalk')
+      expect(game.getWallet(1)).to.equal(1700)
+      expect(game.getPlayerPosition(1)).to.equal(39)
     })
+    it('Apply move nearest card',async() => {
+      game.setPlayers(1,2,3,4);
+      expect(game.getWallet(1)).to.equal(1500)
+      game.activateMoveCard(1, 'go')
+      expect(game.getWallet(1)).to.equal(1700)
+      expect(game.getPlayerPosition(1)).to.equal(0)
+      game.activateMoveCard(1, 'boardwalk')
+      expect(game.getWallet(1)).to.equal(1700)
+      expect(game.getPlayerPosition(1)).to.equal(39)
+
+      game.setPlayerPosition(2,4);
+      game.activateMoveNearestCard(2,'Utilities');
+      expect(game.getPlayerPosition(2)).to.equal(12);
+
+      game.setPlayerPosition(2,20)
+      game.activateMoveNearestCard(2,'Utilities');
+      expect(game.getPlayerPosition(2)).to.equal(28);
+
+      game.setPlayerPosition(2,30)
+      game.activateMoveNearestCard(2,'Utilities');
+      expect(game.getPlayerPosition(2)).to.equal(12);
+
+      game.setPlayerPosition(2,8)
+      game.activateMoveNearestCard(2,'Railroad');
+      expect(game.getPlayerPosition(2)).to.equal(15);
+
+      game.setPlayerPosition(2,20)
+      game.activateMoveNearestCard(2,'Railroad');
+      expect(game.getPlayerPosition(2)).to.equal(25);
+
+      game.setPlayerPosition(2,30)
+      game.activateMoveNearestCard(2,'Railroad');
+      expect(game.getPlayerPosition(2)).to.equal(35);
+
+      game.setPlayerPosition(2,1)
+      game.activateMoveNearestCard(2,'Railroad');
+      expect(game.getPlayerPosition(2)).to.equal(5);
+
+      game.setPlayerPosition(2,1)
+      game.activateMoveNearestCard(2,'Railroad');
+      expect(game.getPlayerPosition(2)).to.equal(5);
+    })
+    it('Apply go to jail card',async() => {
+
+      game.setPlayers(1,2,3,4);
+      game.setPlayerPosition(2,1)
+      game.activateJailCard(2);
+      expect(game.getPlayerPosition(2)).to.equal(10)
+      expect(game.inJail(2)).to.equal(true);
+      game.releaseFromJail(2);
+      expect(game.inJail(2)).to.equal(false);
+    })
+    it('Apply property charges', async () => {
+      game.assignOwnership(9, 'parkplace');
+      game.assignOwnership(9, 'boardwalk');
+      game.addHouse('parkplace');
+      game.addHouse('boardwalk');
+      game.addHouse('parkplace');
+      expect(game.activatePropertyCharges(9)).to.equal(75)
+      game.addHouse('boardwalk');
+      game.addHouse('parkplace');
+      game.addHouse('boardwalk');
+      game.addHouse('parkplace');
+      game.addHouse('boardwalk');
+      expect(game.activatePropertyCharges(9)).to.equal(200)
+      game.addHouse('parkplace');
+      expect(game.activatePropertyCharges(9)).to.equal(200)
+    });
   })
 })
