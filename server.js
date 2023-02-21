@@ -245,7 +245,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
         console.log(result);
         res.redirect('/home')
 
- 
+  
 
     } catch (e) {
         console.log(e);
@@ -267,8 +267,7 @@ app.post('/logout', redirectLogin, (req, res) => {
     })
 
 })
-
-
+ 
 
 app.listen(PORT, () => { console.log(`server is listening on ${PORT}`) });
 
@@ -280,4 +279,8 @@ function getContext(id) {
 hbs.registerHelper("getProperty", function(id) {
     return "tile name='greatestever' group=green orientation=90deg"
   
+  });
+hbs.registerHelper("getHouseCount", function(id) {
+    return '333333'
+    
   });
