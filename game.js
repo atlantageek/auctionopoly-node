@@ -103,7 +103,7 @@ class Game {
     player_wallets = [];
     player_in_jail = [];
     board = [];
-    community_chest=[];
+    community_chest = [];
     chance = [];
     constructor() {
     }
@@ -117,9 +117,9 @@ class Game {
                 if (property['group'] == 'special') return new Event(property)
                 return new Property(property);
             })
-            this.chance=parsed_data['chance'];
+            this.chance = parsed_data['chance'];
             console.log(this.communitychest);
-            this.community_chest=parsed_data['communitychest']
+            this.community_chest = parsed_data['communitychest']
             if (data) return true;
             return false;
         }
@@ -270,40 +270,40 @@ class Game {
         let player_idx = this.getPlayerIdx(player_id);
         this.player_in_jail[player_idx] = false;
     }
-    activateMoveCard(player_id,tile_id) {
+    activateMoveCard(player_id, tile_id) {
         let tile_idx = this.getTileIdx(tile_id);
-        let player_pos=this.getPlayerPosition(player_id);
+        let player_pos = this.getPlayerPosition(player_id);
         let player_idx = this.getPlayerIdx(player_id)
-        if (player_pos >=tile_idx) {
-            this.player_wallets[player_idx] +=200;
+        if (player_pos >= tile_idx) {
+            this.player_wallets[player_idx] += 200;
         }
-        this.setPlayerPosition(player_id,tile_idx);
+        this.setPlayerPosition(player_id, tile_idx);
         return 0;
     }
-    activateMoveNearestCard(player_id,group_name) {
-        let player_pos=this.getPlayerPosition(player_id);
+    activateMoveNearestCard(player_id, group_name) {
+        let player_pos = this.getPlayerPosition(player_id);
         let tile_positions = this.getIdsByGroup(group_name).map(property_id => {
             return +(this.getTileIdx(property_id));
-        }).sort((a,b)=>a-b);
-        let target_pos=tile_positions.find(pos => +player_pos < +pos);
+        }).sort((a, b) => a - b);
+        let target_pos = tile_positions.find(pos => +player_pos < +pos);
         if (target_pos == undefined) {
-            target_pos=tile_positions[0];
+            target_pos = tile_positions[0];
             //Looks like they will pass go.
         }
-        this.setPlayerPosition(player_id,target_pos);
+        this.setPlayerPosition(player_id, target_pos);
         return 0;
     }
     activateJailCard(player_id) {
         this.sendPlayerToJail(player_id);
     }
     activatePropertyCharges(player_id) {
-        let property_list =this.board.filter(property=>property.owned_by==player_id)
-        let property_tax=this.board.reduce((sofar,p)=>{
-            let result=0;
-            if (p.house_count < 5)  {result=sofar + p.house_count * 25 ;}
-            else {result=sofar + 100;}
+        let property_list = this.board.filter(property => property.owned_by == player_id)
+        let property_tax = this.board.reduce((sofar, p) => {
+            let result = 0;
+            if (p.house_count < 5) { result = sofar + p.house_count * 25; }
+            else { result = sofar + 100; }
             return result;
-        },0)
+        }, 0)
         return property_tax;
     }
     //activateAddFunds(player_id, )

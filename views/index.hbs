@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/base.css">
+    <title>
+        Welcome
+    </title>
+</head>
+<html>
+
+<body>
+    <h1> Welcome!</h1>
+    {{email}}
+    {{#if email}}
+    <a href='/home'> Home </a>
+    <form method='post' action='/logout'>
+        <button>Logout</button>
+    </form>
+    {{else}}
+    <a href='/login'> Login </a>
+    <a href='/register'> Register </a>
+    {{/if}}
+</body>
+
+</html>

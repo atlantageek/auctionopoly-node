@@ -4,12 +4,16 @@ require("dotenv").config();
 const session = require('express-session');
 const redisStore = require('connect-redis')(session);
 const bodyParser = require('body-parser');
+const path = require('path')
+const hbs = require('hbs')
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
 const ACCOUNT_NAMESPACE='account:'
 
-
+hbs.registerPartials(path.join(__dirname, 'views/partials'));
 const app = express();
-
+const publicPath = path.join(__dirname, 'public');
 const cors = require("cors");
 
 app.use(cors());
@@ -35,7 +39,7 @@ const REDIS_PORT = process.env.REDIS_PORT;
 // });
 
 // redisClient.connect().catch(console.error)
-
+ 
 //create the ioredis client
 const redisClient = new redis();
 
@@ -48,7 +52,9 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(bodyParser.json())
-
+app.use('/', express.static(publicPath));
+app.set('views', path.join(__dirname) + '/views')
+app.set('view engine','hbs')
 
 app.use(session({
     name: process.env.SESS_NAME,
@@ -87,15 +93,9 @@ const redirectHome = (req, res, next) => {
 app.get('/', (req, res) => {
     const { email } = req.session
     console.log(email);
-    res.send(`
-    <h1> Welcome!</h1>
-     ${email ? `<a href = '/home'> Home </a>
-    <form method='post' action='/logout'>
-    <button>Logout</button>
-    </form>` : `<a href = '/login'> Login </a>
-   <a href = '/register'> Register </a>
-`}
-    `)
+    res.render('index',{
+        email:email
+    })
 })
 
 
@@ -139,7 +139,14 @@ app.get('/login', redirectHome, (req, res) => {
     `)
 })
 
-
+app.get('/board', async (req, res) => {
+    console.log("Board")
+    let data = await fs.promises.readFile('monopoly.json');
+    let parsed_data = JSON.parse(data);
+    res.render('board',{
+        tiles:parsed_data['tiles']
+    })
+})
 
 
 
@@ -170,7 +177,7 @@ app.post('/login', redirectHome, async (req, res, next) => {
         let password = req.body.password;
         let obj = await redisClient.hgetall(ACCOUNT_NAMESPACE + email)
 
-
+        console.log(email,password)
         if (!obj) {
             return res.send({
                 message: "Invalid email or password"
@@ -205,14 +212,14 @@ app.post('/login', redirectHome, async (req, res, next) => {
 
 
 app.post('/register', redirectHome, async (req, res, next) => {
-    try {
-        console.log("Register")
+    try {   
+        console.log("Register") 
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
         const email = req.body.email;
         let password = req.body.password;
 
-
+ 
         if (!firstName || !lastName || !email || !password) {
             return res.sendStatus(400);
         }
@@ -238,7 +245,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
         console.log(result);
         res.redirect('/home')
 
-
+ 
 
     } catch (e) {
         console.log(e);
@@ -264,3 +271,13 @@ app.post('/logout', redirectLogin, (req, res) => {
 
 
 app.listen(PORT, () => { console.log(`server is listening on ${PORT}`) });
+
+
+function getContext(id) {
+    return {name:'great', orientation:'180deg', group:'red'}
+}
+ 
+hbs.registerHelper("getProperty", function(id) {
+    return "tile name='greatestever' group=green orientation=90deg"
+  
+  });

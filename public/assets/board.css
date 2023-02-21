@@ -1,0 +1,28 @@
+body {
+    background-color: lightgray;
+  }
+
+.board {
+    background-color:lightblue;
+    display:flex;
+    flex-direction:column;
+    width:80%;
+
+    aspect-ratio: 1 / 2;
+}
+/* .board:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+  } */
+.board_row{
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+}
+.tile {
+    border: 1px dashed red;
+    width:9%;
+    aspect-ratio: 1/1;
+}
+
