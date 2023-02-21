@@ -8,7 +8,7 @@ body {
     flex-direction:column;
     width:80%;
 
-    aspect-ratio: 1 / 2;
+    aspect-ratio: 1 / 1;
 }
 /* .board:after {
     content: "";
