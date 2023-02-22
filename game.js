@@ -93,6 +93,12 @@ class Property extends Card {
         if (owned_in_group == 3) return this._rent * 3;
         else return this._rent;
     }
+    mortgaged(val) {
+        this._mortgaged=val;
+    }
+    is_mortgaged() {
+        return this._mortgaged;
+    }
 }
 
 

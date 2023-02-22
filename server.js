@@ -16,6 +16,7 @@ hbs.registerPartials(path.join(__dirname, 'views/partials'));
 const app = express();
 const publicPath = path.join(__dirname, 'public');
 const cors = require("cors");
+const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
 
 app.use(cors());
 
@@ -25,8 +26,10 @@ game.initialize().then((gobj) => {
     gobj.setPlayers(1, 2, 3, 4) 
     gobj.assignOwnership(2, 'boardwalk');
     gobj.assignOwnership(2, 'parkplace');
+    gobj.assignOwnership(3, 'mediterraneanave');
     let property = game.getProperty('boardwalk');
     let property2 = game.getProperty('parkplace');
+    let mort_property=game.getProperty('mediterraneanave')
     property.add_house(); 
     property2.add_house(); 
     property.add_house(); 
@@ -36,6 +39,7 @@ game.initialize().then((gobj) => {
     property.add_house(); 
     property2.add_house(); 
     property.add_house(); 
+    mort_property.mortgaged(true)
      
 }) 
  
@@ -315,4 +319,9 @@ hbs.registerHelper("hotel", function (id) {
     let property = game.getProperty(id); 
     if (id) return property.house_count == 5
     return false
+});
+hbs.registerHelper("mortgageColor", function (id) {
+    let property = game.getProperty(id); 
+    if (id) return property.is_mortgaged() ? "red" : "blue";
+    return "white"
 });
