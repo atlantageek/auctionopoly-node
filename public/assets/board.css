@@ -1,7 +1,13 @@
 body {
     background-color: lightgray;
   }
-
+.board_container {
+  display:flex;
+  max-width:90%;
+  max-height:90%;
+  aspect-ratio: 1 / 1;
+  background-color: green;
+}
 .board {
     background-color:lightblue;
     display:flex;

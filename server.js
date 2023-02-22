@@ -324,4 +324,4 @@ hbs.registerHelper("mortgageColor", function (id) {
     let property = game.getProperty(id); 
     if (id) return property.is_mortgaged() ? "red" : "blue";
     return "white"
-});
+}); 

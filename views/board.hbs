@@ -8,72 +8,77 @@
 <html>
 
 <body>
-<div class="board">
-    <div class="board_row">
-         <div class="tile">{{> park }}</div>
-        <div class="tile">{{> property name='Kentucky Ave.' group='red' orientation='180deg' }}</div>
-       
-        <div class="tile">{{> risk name='Risk' orientation='180deg' }}</div>
-        <div class="tile">{{> property name='Indiana Ave.' group='red' orientation='180deg' }}</div>
-        <div class="tile">{{> property name='Illinois Ave.' group='red' orientation='180deg' }}</div>
-        <div class="tile">{{> railroad name='B&O Railroad' orientation='180deg' }}</div>
-        <div class="tile">{{> property name='Atlantic Ave.' group='yellow' orientation='180deg' }}</div>
-        <div class="tile">{{> property name='Ventor Ave.' group='yellow' orientation='180deg' }}</div>
-        <div class="tile">{{> railroad name='Utility' orientation='180deg' }}</div>
-        <div class="tile">{{> property name='Marvin Gardens' group='yellow' orientation='180deg' }}</div>
-        <div class="tile">{{> arrest }}</div>
+    <div class="board_container">
+
+        <div class="board">
+            <div class="board_row">
+                <div class="tile">{{> park }}</div>
+                <div class="tile">{{> property name='Kentucky Ave.' group='red' orientation='180deg' }}</div>
+
+                <div class="tile">{{> risk name='Risk' orientation='180deg' }}</div>
+                <div class="tile">{{> property name='Indiana Ave.' group='red' orientation='180deg' }}</div>
+                <div class="tile">{{> property name='Illinois Ave.' group='red' orientation='180deg' }}</div>
+                <div class="tile">{{> railroad name='B&O Railroad' orientation='180deg' }}</div>
+                <div class="tile">{{> property name='Atlantic Ave.' group='yellow' orientation='180deg' }}</div>
+                <div class="tile">{{> property name='Ventor Ave.' group='yellow' orientation='180deg' }}</div>
+                <div class="tile">{{> railroad name='Utility' orientation='180deg' }}</div>
+                <div class="tile">{{> property name='Marvin Gardens' group='yellow' orientation='180deg' }}</div>
+                <div class="tile">{{> arrest }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> property name='New York Ave.' group='orange' orientation='90deg' }}</div>
+                <div class="tile">{{> property name='Pacific Ave.' group='green' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> property name='Tennessee Ave.' group='orange' orientation='90deg' }}</div>
+                <div class="tile">{{> property name='NC Ave.' group='green' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> risk name='Reward' orientation='90deg' }}</div>
+                <div class="tile">{{> risk name='Reward' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> property name='St. James Place' group='orange' orientation='90deg' }}</div>
+                <div class="tile">{{> property name='Pennsylvania Ave.' group='green' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> railroad name='B&O Railroad' orientation='90deg' }}</div>
+                <div class="tile">{{> railroad name='B&O Railroad' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> property name='Virginia Ave.' group='maroon' orientation='90deg'
+                    house_count=(getHouseCount 4) }}</div>
+                <div class="tile">{{> risk name='Risk' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> property name='States Ave.' group='maroon' orientation='90deg' }}</div>
+                <div class="tile">{{> property name='Park Place' group='darkblue' orientation='270deg' id='parkplace'}}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> railroad name='Utility' orientation='90deg' }}</div>
+                <div class="tile">{{> tax name='TAX $100' orientation='270deg' }}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> property name='St. Charles Place' group='maroon' orientation='90deg' }}</div>
+                <div class="tile">{{> property name='Boardwalk' group='darkblue' orientation='270deg' id='boardwalk'}}</div>
+            </div>
+            <div class="board_row">
+                <div class="tile">{{> jail }}</div>
+                <div class="tile">{{> property name='Conneticut Ave.' group='lightblue' orientation='0deg' }}</div>
+
+                <div class="tile">{{> property name='Vermont Ave.' group='lightblue' orientation='0deg' }}</div>
+                <div class="tile">{{> risk name='Risk' orientation='0deg' }}</div>
+                <div class="tile">{{> property name='Oriental Ave.' group='lightblue' orientation='0deg' }}</div>
+                <div class="tile">{{> railroad name='B&O Railroad' orientation='0deg' }}</div>
+                <div class="tile">{{> tax name='TAX $200' orientation='0deg' }}</div>
+                <div class="tile">{{> property name='Baltic Ave.' group='purple' orientation='0deg' }}</div>
+                <div class="tile">{{> risk name='Reward' orientation='0deg' }}</div>
+                <div class="tile">{{> property name='Mediteranean Ave.' group='purple' orientation='0deg' id='mediterraneanave'}}</div>
+                <div class="tile">{{> go }}</div>
+            </div>
+        </div>
+
     </div>
-    <div class="board_row">
-        <div class="tile">{{> property name='New York Ave.' group='orange' orientation='90deg' }}</div>
-        <div class="tile">{{> property name='Pacific Ave.' group='green' orientation='270deg' }}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> property name='Tennessee Ave.' group='orange' orientation='90deg' }}</div>
-        <div class="tile">{{> property name='NC Ave.' group='green' orientation='270deg' }}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> risk name='Reward' orientation='90deg' }}</div>
-        <div class="tile">{{> risk name='Reward' orientation='270deg' }}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> property name='St. James Place' group='orange' orientation='90deg' }}</div>
-        <div class="tile">{{> property name='Pennsylvania Ave.' group='green' orientation='270deg' }}</div>
-    </div>
-        <div class="board_row">
-        <div class="tile">{{> railroad name='B&O Railroad' orientation='90deg' }}</div>
-        <div class="tile">{{> railroad name='B&O Railroad' orientation='270deg' }}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> property name='Virginia Ave.' group='maroon' orientation='90deg' house_count=(getHouseCount 3) }}</div>
-        <div class="tile">{{> risk name='Risk' orientation='270deg' }}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> property name='States Ave.' group='maroon' orientation='90deg' }}</div>
-        <div class="tile">{{> property name='Park Place' group='darkblue' orientation='270deg' id='parkplace'}}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> railroad name='Utility' orientation='90deg' }}</div>
-        <div class="tile">{{> tax name='TAX $100' orientation='270deg' }}</div>
-    </div>
-    <div class="board_row">
-        <div class="tile">{{> property name='St. Charles Place' group='maroon' orientation='90deg' }}</div>
-        <div class="tile">{{> property name='Boardwalk' group='darkblue' orientation='270deg' id='boardwalk'}}</div>
-    </div>
-        <div class="board_row">
-         <div class="tile">{{> jail }}</div>
-        <div class="tile">{{> property name='Conneticut Ave.' group='lightblue' orientation='0deg' }}</div>
-       
-        <div class="tile">{{> property name='Vermont Ave.' group='lightblue' orientation='0deg' }}</div>
-        <div class="tile">{{> risk name='Risk' orientation='0deg' }}</div>
-        <div class="tile">{{> property name='Oriental Ave.' group='lightblue' orientation='0deg' }}</div>
-        <div class="tile">{{> railroad name='B&O Railroad' orientation='0deg' }}</div>
-        <div class="tile">{{> tax name='TAX $200' orientation='0deg' }}</div>
-        <div class="tile">{{> property name='Baltic Ave.' group='purple' orientation='0deg' }}</div>
-         <div class="tile">{{> risk name='Reward' orientation='0deg' }}</div>
-        <div class="tile">{{> property name='Mediteranean Ave.' group='purple' orientation='0deg' id='mediterraneanave'}}</div>
-        <div class="tile">{{> go }}</div>
-    </div>
-</div>
 </body>
 
 </html>
