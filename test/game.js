@@ -14,8 +14,8 @@ describe('#game()', function () {
 
       expect(game.board.length).to.equal(40)
       expect(game.board[39].id).to.equal('boardwalk')
-      expect(game.community_chest.length).to.equal(16)
-      expect(game.chance.length).to.equal(15);
+      expect(game.community_chest.length).to.equal(15)
+      expect(game.chance.length).to.equal(14);
     })
   })
   context('add players', () => {

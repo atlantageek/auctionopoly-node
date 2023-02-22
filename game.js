@@ -120,7 +120,7 @@ class Game {
             this.chance = parsed_data['chance'];
             console.log(this.communitychest);
             this.community_chest = parsed_data['communitychest']
-            if (data) return true;
+            if (data) return this;
             return false;
         }
         catch (e) {

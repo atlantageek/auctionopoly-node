@@ -1,15 +1,16 @@
 const express = require('express');
 const redis = require("ioredis")
 require("dotenv").config();
+var Game = require('./game.js');
 const session = require('express-session');
 const redisStore = require('connect-redis')(session);
 const bodyParser = require('body-parser');
 const path = require('path')
 const hbs = require('hbs')
-const fs = require('fs');
+const fs = require('fs'); 
 const fsPromises = require('fs').promises;
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
-const ACCOUNT_NAMESPACE='account:'
+const ACCOUNT_NAMESPACE = 'account:'
 
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 const app = express();
@@ -18,6 +19,26 @@ const cors = require("cors");
 
 app.use(cors());
 
+//setup Game Object
+let game = new Game();
+game.initialize().then((gobj) => {
+    gobj.setPlayers(1, 2, 3, 4) 
+    gobj.assignOwnership(2, 'boardwalk');
+    gobj.assignOwnership(2, 'parkplace');
+    let property = game.getProperty('boardwalk');
+    let property2 = game.getProperty('parkplace');
+    property.add_house(); 
+    property2.add_house(); 
+    property.add_house(); 
+    property2.add_house(); 
+    property.add_house(); 
+    property2.add_house(); 
+    property.add_house(); 
+    property2.add_house(); 
+    property.add_house(); 
+     
+}) 
+ 
 
 const PORT = process.env.APP_PORT;
 const IN_PROD = process.env.NODE_ENV === 'production'
@@ -25,21 +46,6 @@ const TWO_HOURS = 1000 * 60 * 60 * 2
 
 const REDIS_PORT = process.env.REDIS_PORT;
 
-
-//create the redis client
-// const redisClient = redis.createClient({
-//     host: 'localhost',
-//     port: REDIS_PORT
-// })
-// redisClient.on('error', function (err) {
-//     console.log('Could not establish a connection with redis. ' + err);
-// });
-// redisClient.on('connect', function (err) {
-//     console.log('Connected to redis successfully');
-// });
-
-// redisClient.connect().catch(console.error)
- 
 //create the ioredis client
 const redisClient = new redis();
 
@@ -54,7 +60,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json())
 app.use('/', express.static(publicPath));
 app.set('views', path.join(__dirname) + '/views')
-app.set('view engine','hbs')
+app.set('view engine', 'hbs')
 
 app.use(session({
     name: process.env.SESS_NAME,
@@ -93,8 +99,8 @@ const redirectHome = (req, res, next) => {
 app.get('/', (req, res) => {
     const { email } = req.session
     console.log(email);
-    res.render('index',{
-        email:email
+    res.render('index', {
+        email: email
     })
 })
 
@@ -143,8 +149,8 @@ app.get('/board', async (req, res) => {
     console.log("Board")
     let data = await fs.promises.readFile('monopoly.json');
     let parsed_data = JSON.parse(data);
-    res.render('board',{
-        tiles:parsed_data['tiles']
+    res.render('board', {
+        tiles: parsed_data['tiles']
     })
 })
 
@@ -177,7 +183,7 @@ app.post('/login', redirectHome, async (req, res, next) => {
         let password = req.body.password;
         let obj = await redisClient.hgetall(ACCOUNT_NAMESPACE + email)
 
-        console.log(email,password)
+        console.log(email, password)
         if (!obj) {
             return res.send({
                 message: "Invalid email or password"
@@ -212,14 +218,14 @@ app.post('/login', redirectHome, async (req, res, next) => {
 
 
 app.post('/register', redirectHome, async (req, res, next) => {
-    try {   
-        console.log("Register") 
+    try {
+        console.log("Register")
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
         const email = req.body.email;
         let password = req.body.password;
 
- 
+
         if (!firstName || !lastName || !email || !password) {
             return res.sendStatus(400);
         }
@@ -229,11 +235,12 @@ app.post('/register', redirectHome, async (req, res, next) => {
 
         console.log("HSET")
         console.log(redisClient)
-        let result = await redisClient.hset('account:'+email,{
+        let result = await redisClient.hset('account:' + email, {
             'first_name': firstName,
             'last_name': lastName,
             'email': email,
-            'password': password});
+            'password': password
+        });
         // , function (err, reply) {
         //     if (err) {
         //         console.log(err);
@@ -245,7 +252,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
         console.log(result);
         res.redirect('/home')
 
-  
+
 
     } catch (e) {
         console.log(e);
@@ -267,20 +274,45 @@ app.post('/logout', redirectLogin, (req, res) => {
     })
 
 })
-  
+
 
 app.listen(PORT, () => { console.log(`server is listening on ${PORT}`) });
 
 
 function getContext(id) {
-    return {name:'great', orientation:'180deg', group:'red'}
+    return { name: 'great', orientation: '180deg', group: 'red' }
 }
- 
-hbs.registerHelper("getProperty", function(id) {
+
+hbs.registerHelper("getProperty", function (id) {
     return "tile name='greatestever' group=green orientation=90deg"
-  
-  });
-hbs.registerHelper("getHouseCount", function(id) {
+
+});
+hbs.registerHelper("getHouseCount", function (id) {
     return '333333'
-    
-  });
+
+});
+hbs.registerHelper("firstHouse", function (id) {
+    let property = game.getProperty(id);
+    if (id) return property.house_count >=1 && property.house_count <5
+    return false
+});
+hbs.registerHelper("secondHouse", function (id) {
+    let property = game.getProperty(id);
+    if (id) return property.house_count >=2 && property.house_count <5
+    return false
+});
+hbs.registerHelper("thirdHouse", function (id) {
+    let property = game.getProperty(id);
+    if (id) return property.house_count >=3 && property.house_count <5
+    return false
+}); 
+hbs.registerHelper("fourthHouse", function (id) {
+    let property = game.getProperty(id);
+    if (id) return property.house_count >=4 && property.house_count <5
+    return false 
+});
+hbs.registerHelper("hotel", function (id) {
+    let property = game.getProperty(id); 
+    if (id) return property.house_count == 5
+    return false
+});
