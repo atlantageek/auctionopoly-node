@@ -17,7 +17,7 @@ const app = express();
 const publicPath = path.join(__dirname, 'public');
 const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
-
+ 
 app.use(cors());
 
 //setup Game Object
@@ -135,7 +135,7 @@ app.get('/home', redirectLogin, async (req, res) => {
     }
 
 })
-
+ 
 
 app.get('/login', redirectHome, (req, res) => {
     res.send(`
@@ -286,14 +286,12 @@ app.listen(PORT, () => { console.log(`server is listening on ${PORT}`) });
 function getContext(id) {
     return { name: 'great', orientation: '180deg', group: 'red' }
 }
-
+  
 hbs.registerHelper("getProperty", function (id) {
     return "tile name='greatestever' group=green orientation=90deg"
-
 });
 hbs.registerHelper("getHouseCount", function (id) {
     return '333333'
-
 });
 hbs.registerHelper("firstHouse", function (id) {
     let property = game.getProperty(id);
@@ -317,7 +315,7 @@ hbs.registerHelper("fourthHouse", function (id) {
 });
 hbs.registerHelper("hotel", function (id) {
     let property = game.getProperty(id); 
-    if (id) return property.house_count == 5
+    if (id) return property.house_count == 5 
     return false
 });
 hbs.registerHelper("mortgageColor", function (id) {

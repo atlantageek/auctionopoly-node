@@ -32,4 +32,18 @@ body {
     width:9%;
     aspect-ratio: 1/1;
 }
-
+.hotel {
+  visibility:hidden;
+}
+.firsthouse {
+  visibility:hidden;
+}
+.secondhouse {
+  visibility:hidden;
+}
+.thirdhouse {
+  visibility:hidden;
+}
+.fourthhouse {
+  visibility:hidden;
+}
