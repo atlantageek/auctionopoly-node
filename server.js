@@ -9,11 +9,13 @@ const path = require('path')
 const hbs = require('hbs')
 const fs = require('fs'); 
 const fsPromises = require('fs').promises;
+
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
 const ACCOUNT_NAMESPACE = 'account:'
 
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 const app = express();
+const expressWs = require('express-ws')(app)
 const publicPath = path.join(__dirname, 'public');
 const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
@@ -98,7 +100,12 @@ const redirectHome = (req, res, next) => {
     }
 }
 
-
+app.ws('/ws', function(ws, req) {
+    ws.on('message', function(msg) {
+      console.log(msg);
+    });
+    console.log('socket', req.testing);
+  });
 
 app.get('/', (req, res) => {
     const { email } = req.session
