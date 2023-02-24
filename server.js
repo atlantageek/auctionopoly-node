@@ -44,8 +44,7 @@ game.initialize().then((gobj) => {
     mort_property.mortgaged(true)
       
 }) 
- 
-
+  
 const PORT = process.env.APP_PORT;
 const IN_PROD = process.env.NODE_ENV === 'production'
 const TWO_HOURS = 1000 * 60 * 60 * 2
@@ -99,10 +98,14 @@ const redirectHome = (req, res, next) => {
         next()
     }
 }
-
+ 
 app.ws('/ws', function(ws, req) {
     ws.on('message', function(msg) {
       console.log(msg);
+      setInterval(() => {
+        game.nextTurn();
+        ws.send(JSON.stringify(game))
+      },1000)
     });
     console.log('socket', req.testing);
   });
