@@ -40,7 +40,7 @@ game.initialize().then((gobj) => {
     property2.add_house(); 
     property.add_house(); 
     mort_property.mortgaged(true)
-     
+      
 }) 
  
 
