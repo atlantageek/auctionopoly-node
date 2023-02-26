@@ -104,6 +104,7 @@ class Property extends Card {
 
 class Game {
     turn = 0;
+    player_names=[];
     player_list = [];
     player_positions = [];
     player_wallets = [];
@@ -142,6 +143,7 @@ class Game {
         this.player_positions = [0, 0, 0, 0];
         this.player_wallets = [1500, 1500, 1500, 1500];
         this.player_injail = [false, false, false, false]
+        this.player_names=['Bob1','Eve2','William3','Jenny4']
         //randomize players;
         //this.randomizePlayers();
     }

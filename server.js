@@ -21,7 +21,7 @@ const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
  
 app.use(cors());
-
+  
 //setup Game Object
 let game = new Game();
 game.initialize().then((gobj) => {
@@ -38,13 +38,13 @@ game.initialize().then((gobj) => {
     property2.add_house(); 
     property.add_house(); 
     property2.add_house(); 
-    property.add_house(); 
+    property.add_house();  
     property2.add_house(); 
     property.add_house(); 
     mort_property.mortgaged(true)
-      
+    
 }) 
-  
+
 const PORT = process.env.APP_PORT;
 const IN_PROD = process.env.NODE_ENV === 'production'
 const TWO_HOURS = 1000 * 60 * 60 * 2
@@ -56,7 +56,7 @@ const redisClient = new redis();
 
 
 const sessionStore = new redisStore({ client: redisClient });
-
+ 
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -80,7 +80,6 @@ app.use(session({
     }
 }))
 
-
 const redirectLogin = (req, res, next) => {
     if (!req.session.email) {
         res.redirect('/login')
@@ -88,9 +87,7 @@ const redirectLogin = (req, res, next) => {
         next()
     }
 }
-
-
-
+   
 const redirectHome = (req, res, next) => {
     if (req.session.email) {
         res.redirect('/home')
@@ -98,15 +95,14 @@ const redirectHome = (req, res, next) => {
         next()
     }
 }
- 
+
 app.ws('/ws', function(ws, req) {
     ws.on('message', function(msg) {
       console.log(msg);
       setInterval(() => {
-        game.nextTurn();
         ws.send(JSON.stringify(game))
-      },1000)
-    });
+      },4000) 
+    });   
     console.log('socket', req.testing);
   });
 
@@ -116,9 +112,8 @@ app.get('/', (req, res) => {
     res.render('index', {
         email: email
     })
-})
-
-
+}) 
+ 
 app.get('/home', redirectLogin, async (req, res) => {
     const { email } = req.session
     console.log(email);
@@ -134,7 +129,7 @@ app.get('/home', redirectLogin, async (req, res) => {
         <ul>
         <li> Name: ${obj.first_name} </li>
         <li> Email:${obj.email} </li>
-        </ul>
+        </ul> 
       
         `)
             })
@@ -167,10 +162,7 @@ app.get('/board', async (req, res) => {
         tiles: parsed_data['tiles']
     })
 })
-
-
-
-
+  
 
 app.get('/register', redirectHome, (req, res) => {
     console.log("hi")
@@ -186,7 +178,6 @@ app.get('/register', redirectHome, (req, res) => {
     <a href='/login'>Login</a>
     `)
 })
-
 
 
 

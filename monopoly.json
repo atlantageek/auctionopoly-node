@@ -742,11 +742,11 @@
         "averageProbability": 8.897
       },
       {
-        "name": "Chance",
-        "id": "chance",
+        "name": "risk",
+        "id": "risk",
         "group": "Special",
         "rel": {
-          "Square": "Chance",
+          "Square": "risk",
           "Probability % (Jail Short)": 0.865,
           "Rank": 40,
           "Probability % (Jail Long)": 0.8152
@@ -767,7 +767,7 @@
       },
       {
         "name": "Community Chest",
-        "id": "communitychest",
+        "id": "reward",
         "group": "Special",
         "rel": {
           "Square": "Community Chest",
@@ -799,12 +799,12 @@
     "tiles": [
       {"id": "go"},
       {"id": "mediterraneanave"},
-      {"id": "communitychest"},
+      {"id": "reward"},
       {"id": "balticave"},
       {"id": "incometax"},
       {"id": "readingrailroad"},
       {"id": "orientalave"},
-      {"id": "chance"},
+      {"id": "risk"},
       {"id": "vermontave"},
       {"id": "connecticutave"},
       {"id": "jail"},
@@ -814,12 +814,12 @@
       {"id": "virginiaave"},
       {"id": "pennsylvaniarailroad"},
       {"id": "stjamesplace"},
-      {"id": "communitychest"},
+      {"id": "reward"},
       {"id": "tennesseeave"},
       {"id": "newyorkave"},
       {"id": "freeparking"},
       {"id": "kentuckyave"},
-      {"id": "chance"},
+      {"id": "risk"},
       {"id": "indianaave"},
       {"id": "illinoisave"},
       {"id": "borailroad"},
@@ -830,15 +830,15 @@
       {"id": "gotojail"},
       {"id": "pacificave"},
       {"id": "northcarolinaave"},
-      {"id": "communitychest"},
+      {"id": "reward"},
       {"id": "pennsylvaniaave"},
       {"id": "shortlinerailroad"},
-      {"id": "chance"},
+      {"id": "risk"},
       {"id": "parkplace"},
       {"id": "luxerytax"},
       {"id": "boardwalk"}
     ],
-    "chance": [
+    "risk": [
       {
         "title": "Advance to Go (Collect $200)",
         "action": "move",
@@ -913,7 +913,7 @@
         "amount": 50
       }
     ],
-    "communitychest": [
+    "reward": [
       {
         "title": "Advance to Go (Collect $200)",
         "action": "move",
