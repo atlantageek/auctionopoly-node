@@ -20,7 +20,7 @@ const publicPath = path.join(__dirname, 'public');
 const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
  
-app.use(cors());
+app.use(cors()); 
    
 //setup Game Object
 let game = new Game();
@@ -29,6 +29,7 @@ game.initialize().then((gobj) => {
     gobj.assignOwnership(2, 'boardwalk');
     gobj.assignOwnership(2, 'parkplace');
     gobj.assignOwnership(3, 'mediterraneanave');
+
     let property = game.getProperty('boardwalk');
     let property2 = game.getProperty('parkplace');
     let mort_property=game.getProperty('mediterraneanave')
@@ -42,8 +43,7 @@ game.initialize().then((gobj) => {
     property2.add_house(); 
     property.add_house(); 
     mort_property.mortgaged(true)
-}) 
-
+})   
 const PORT = process.env.APP_PORT;
 const IN_PROD = process.env.NODE_ENV === 'production'
 const TWO_HOURS = 1000 * 60 * 60 * 2
@@ -99,8 +99,12 @@ app.ws('/ws', function(ws, req) {
     ws.on('message', function(msg) {
       console.log(msg);
       setInterval(() => {
+        game.moveBy(1,1);
+        game.moveBy(2,2);
+        game.moveBy(3,3);
+        game.moveBy(4,4);
         ws.send(JSON.stringify(game))
-      },4000) 
+      },4000)
     });   
     console.log('socket', req.testing);
   });
@@ -172,26 +176,24 @@ app.get('/register', redirectHome, (req, res) => {
     <input type='email' name='email' placeholder='Email' required />
     <input type='password' name='password' placeholder='password' required/>
     <input type='submit' />
-    </form>
+    </form> 
     <a href='/login'>Login</a>
     `)
 })
-
-
-
+   
+  
 app.post('/login', redirectHome, async (req, res, next) => {
     try {
         console.log("LOGIN")
         const email = req.body.email;
         let password = req.body.password;
         let obj = await redisClient.hgetall(ACCOUNT_NAMESPACE + email)
-
         console.log(email, password)
         if (!obj) {
             return res.send({
                 message: "Invalid email or password"
             })
-        }
+        } 
         console.log(obj);
         const isValidPassword = compareSync(password, obj.password);
         if (isValidPassword) {
@@ -202,7 +204,7 @@ app.post('/login', redirectHome, async (req, res, next) => {
             console.log(req.session.email);
             return res.redirect('/home');
         } else {
-            res.send(
+            res.send( 
                 "Invalid email or password"
             );
             return res.redirect('/login')
@@ -227,7 +229,6 @@ app.post('/register', redirectHome, async (req, res, next) => {
         const lastName = req.body.lastName;
         const email = req.body.email;
         let password = req.body.password;
-
 
         if (!firstName || !lastName || !email || !password) {
             return res.sendStatus(400);

@@ -9,6 +9,48 @@
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script defer>
         let player_colors = ['lightgreen', 'lightblue', 'pink', 'yellow']
+        let tiles= [
+      {"id": "go"},
+      {"id": "mediterraneanave"},
+      {"id": "reward1"},
+      {"id": "balticave"},
+      {"id": "incometax"},
+      {"id": "readingrailroad"},
+      {"id": "orientalave"},
+      {"id": "risk1"},
+      {"id": "vermontave"},
+      {"id": "connecticutave"},
+      {"id": "jail"},
+      {"id": "stcharlesplace"},
+      {"id": "electriccompany"},
+      {"id": "statesave"},
+      {"id": "virginiaave"},
+      {"id": "pennsylvaniarailroad"},
+      {"id": "stjamesplace"},
+      {"id": "reward2"},
+      {"id": "tennesseeave"},
+      {"id": "newyorkave"},
+      {"id": "park"},
+      {"id": "kentuckyave"},
+      {"id": "risk2"},
+      {"id": "indianaave"},
+      {"id": "illinoisave"},
+      {"id": "borailroad"},
+      {"id": "atlanticave"},
+      {"id": "ventnorave"},
+      {"id": "waterworks"},
+      {"id": "marvingardens"},
+      {"id": "arrest"},
+      {"id": "pacificave"},
+      {"id": "northcarolinaave"},
+      {"id": "reward3"},
+      {"id": "pennsylvaniaave"},
+      {"id": "shortlinerailroad"},
+      {"id": "risk3"},
+      {"id": "parkplace"},
+      {"id": "luxurytax"},
+      {"id": "boardwalk"}
+    ]
         function init() {
             console.log("LOADED")
             $(".balticave .secondhouse").css("visibility", "visible");
@@ -25,21 +67,31 @@
                 let obj = JSON.parse(msg.data);
                 console.log(obj.board)
                 populateBoard(obj.board, obj.player_list);
-                populatePlayers(obj.player_names, obj.player_wallets);
+                populatePlayers(obj.player_names, obj.player_wallets,obj.player_positions,obj.board);
             });
         };
-        function populatePlayers(player_names,player_wallets) {
-            for (let i=0;i<=player_names.length;i++) {
+        function populatePlayers(player_names,player_wallets, player_positions,) {
+            for (let i=0;i<player_names.length;i++) {
                 let player_id = '#player' + (i+1);
                 $(player_id+' .name').text(player_names[i]);
                 $(player_id + ' .account').text(player_wallets[i]);
+
+            }
+            for (let i=0;i<40;i++) {
+                for (let j=0;j<player_names.length;j++) {
+                    console.log('IDzX: ' + i)
+                    let selector = '.' + tiles[i].id + " .player" + (j+1);
+                    if (player_positions[j] == i) $(selector).css("visibility", "visible");
+                    else $(selector).css("visibility", "hidden");
+                    
+                }
             }
             
         }
         function populateBoard(board, player_list) {
             board.forEach(tile => {
                 let selector = '.' + tile._id;
-                console.log(selector)
+ 
                 if (tile.hasOwnProperty('_house_count')) {
                     if (tile._house_count > 4) {
 
@@ -65,7 +117,6 @@
 
                 }
                 if ( tile['group'] != 'Special')
-                    debugger;
                     if(tile._owned_by != -1) {
 
                         let player_idx = player_list.findIndex(p => p == tile._owned_by)
@@ -75,7 +126,7 @@
                         $(selector + ' .owner').css({ fill: player_colors[player_idx] })
                     }
                     else {
-                        console.log('Noone owns ' + selector)
+                 
                         $(selector + ' .owner').css({ fill: 'white' })
                     }
             })
@@ -94,12 +145,12 @@
                 <div class="tile">{{> property name='Kentucky Ave.' group='red' orientation='180deg' id='kentuckyave'}}
                 </div>
 
-                <div class="tile">{{> risk name='Risk' orientation='180deg' id="risk1"}}</div>
+                <div class="tile">{{> risk name='Risk' orientation='180deg' id="risk2"}}</div>
                 <div class="tile">{{> property name='Indiana Ave.' group='red' orientation='180deg' id='indianaave'}}
                 </div>
                 <div class="tile">{{> property name='Illinois Ave.' group='red' orientation='180deg' id='illinoisave' }}
                 </div>
-                <div class="tile">{{> railroad name='Pennsylvania Railroad' orientation='180deg' id='pennsylvaniarailroad'}}</div>
+                <div class="tile">{{> railroad name='B&O Railroad' orientation='180deg' id='borailroad'}}</div>
                 <div class="tile">{{> property name='Atlantic Ave.' group='yellow' orientation='180deg'
                     id='atlanticave'}}</div>
                 <div class="tile">{{> property name='Ventor Ave.' group='yellow' orientation='180deg' id='ventnorave'}}
@@ -122,8 +173,8 @@
                 </div>
             </div>
             <div class="board_row">
-                <div class="tile">{{> risk name='Reward' orientation='90deg' class="reward1"}}</div>
-                <div class="tile">{{> risk name='Reward' orientation='270deg' class="reward3"}}</div>
+                <div class="tile">{{> reward name='Reward' orientation='90deg' id="reward2"}}</div>
+                <div class="tile">{{> reward name='Reward' orientation='270deg' id="reward3"}}</div>
             </div>
             <div class="board_row">
                 <div class="tile">{{> property name='St. James Place' group='orange' orientation='90deg'
@@ -132,13 +183,13 @@
                     id='pennsylvaniaave' }}</div>
             </div>
             <div class="board_row">
-                <div class="tile">{{> railroad name='reading Railroad' orientation='90deg' id='readingrailroad'}}</div>
-                <div class="tile">{{> railroad name='B&O Railroad' orientation='270deg' id='borailroad'}}</div>
+                <div class="tile">{{> railroad name='Penn. Railroad' orientation='90deg' id='pennsylvaniarailroad'}}</div>
+                <div class="tile">{{> railroad name='Shortline Railroad' orientation='270deg' id='shortlinerailroad'}}</div>
             </div>
             <div class="board_row">
                 <div class="tile">{{> property name='Virginia Ave.' group='maroon' orientation='90deg' id='virginiaave'
                     }}</div>
-                <div class="tile">{{> risk name='Risk' orientation='270deg' class="risk2"}}</div>
+                <div class="tile">{{> risk name='Risk' orientation='270deg' id="risk3"}}</div>
             </div>
             <div class="board_row">
                 <div class="tile">{{> property name='States Ave.' group='maroon' orientation='90deg' id='statesave'}}
@@ -148,7 +199,7 @@
             </div>
             <div class="board_row">
                 <div class="tile">{{> utility name='Electric Company' orientation='90deg' id="electriccompany"}}</div>
-                <div class="tile">{{> tax name='TAX $100' orientation='270deg' }}</div>
+                <div class="tile">{{> tax name='TAX $100' orientation='270deg' id="luxurytax" }}</div>
             </div>
             <div class="board_row">
                 <div class="tile">{{> property name='St. Charles Place' group='maroon' orientation='90deg'
@@ -163,14 +214,14 @@
 
                 <div class="tile">{{> property name='Vermont Ave.' group='lightblue' orientation='0deg' id='vermontave'
                     }}</div>
-                <div class="tile">{{> risk name='Risk' orientation='0deg' class="risk3" }}</div>
+                <div class="tile">{{> risk name='Risk' orientation='0deg' id="risk1" }}</div>
                 <div class="tile">{{> property name='Oriental Ave.' group='lightblue' orientation='0deg'
                     id='orientalave'}}</div>
-                <div class="tile">{{> railroad name='Short Line Railroad' orientation='0deg' id='shortlinerailroad'}}</div>
-                <div class="tile">{{> tax name='TAX $200' orientation='0deg' }}</div>
+                <div class="tile">{{> railroad name='Readingrailroad' orientation='0deg' id='readingrailroad'}}</div>
+                <div class="tile">{{> tax name='TAX $200' orientation='0deg' id='incometax' }}</div>
                 <div class="tile">{{> property name='Baltic Ave.' group='purple' orientation='0deg' id='balticave' }}
                 </div>
-                <div class="tile">{{> risk name='Reward' orientation='0deg' class="reward3"}}</div>
+                <div class="tile">{{> reward name='Reward' orientation='0deg' id="reward1"}}</div>
                 <div class="tile">{{> property name='Mediteranean Ave.' group='purple' orientation='0deg'
                     id='mediterraneanave'}}</div>
                 <div class="tile">{{> go }}</div>
