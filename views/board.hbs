@@ -25,14 +25,16 @@
                 let obj = JSON.parse(msg.data);
                 console.log(obj.board)
                 populateBoard(obj.board, obj.player_list);
-                populatePlayers(obj.player_names);
+                populatePlayers(obj.player_names, obj.player_wallets);
             });
         };
-        function populatePlayers(player_names) {
-            $('#player1 .name').text(player_names[0]);
-            $('#player2 .name').text(player_names[1]);
-            $('#player3 .name').text(player_names[2]);
-            $('#player4 .name').text(player_names[3]);
+        function populatePlayers(player_names,player_wallets) {
+            for (let i=0;i<=player_names.length;i++) {
+                let player_id = '#player' + (i+1);
+                $(player_id+' .name').text(player_names[i]);
+                $(player_id + ' .account').text(player_wallets[i]);
+            }
+            
         }
         function populateBoard(board, player_list) {
             board.forEach(tile => {
@@ -175,10 +177,10 @@
             </div>
         </div>
         <div class="player_list">
-            <div id="player1"><div class="name">Player1</div><div class="account"></div></div>
-            <div id="player2"><div class="name">Player2</div><div class="account"></div></div>
-            <div id="player3"><div class="name">Player3</div><div class="account"></div></div>
-            <div id="player4"><div class="name">Player4</div><div class="account"></div></div>
+            <div id="player1" class="player_details"><div class="name">Player1</div><div class="account"></div></div>
+            <div id="player2" class="player_details" ><div class="name">Player2</div><div class="account"></div></div>
+            <div id="player3" class="player_details"><div class="name">Player3</div><div class="account"></div></div>
+            <div id="player4" class="player_details"><div class="name">Player4</div><div class="account"></div></div>
         </div>
     </div>
 </body>

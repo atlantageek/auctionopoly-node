@@ -47,3 +47,22 @@ body {
 .fourthhouse {
   visibility:hidden;
 }
+.player_list {
+  display:flex;
+  flex-direction:column;
+  width:400px;
+}
+.player_details {
+  display:flex;
+  font-size:40px;
+  flex-direction:row;
+  font-weight:bold;
+  justify-content: space-between;
+  width:100%;
+}
+.player_details .name {
+  padding:10px;
+}
+.player_details .account {
+  padding:10px;
+}

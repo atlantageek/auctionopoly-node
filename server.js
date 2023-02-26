@@ -12,7 +12,7 @@ const fsPromises = require('fs').promises;
 
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
 const ACCOUNT_NAMESPACE = 'account:'
-
+ 
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 const app = express();
 const expressWs = require('express-ws')(app)
@@ -21,7 +21,7 @@ const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
  
 app.use(cors());
-  
+   
 //setup Game Object
 let game = new Game();
 game.initialize().then((gobj) => {
@@ -42,7 +42,6 @@ game.initialize().then((gobj) => {
     property2.add_house(); 
     property.add_house(); 
     mort_property.mortgaged(true)
-    
 }) 
 
 const PORT = process.env.APP_PORT;
@@ -95,7 +94,7 @@ const redirectHome = (req, res, next) => {
         next()
     }
 }
-
+  
 app.ws('/ws', function(ws, req) {
     ws.on('message', function(msg) {
       console.log(msg);
@@ -140,7 +139,6 @@ app.get('/home', redirectLogin, async (req, res) => {
     }
 
 })
- 
 
 app.get('/login', redirectHome, (req, res) => {
     res.send(`
