@@ -14,8 +14,8 @@ describe('#game()', function () {
 
       expect(game.board.length).to.equal(40)
       expect(game.board[39].id).to.equal('boardwalk')
-      expect(game.community_chest.length).to.equal(15)
-      expect(game.chance.length).to.equal(14);
+      expect(game.reward.length).to.equal(15)
+      expect(game.risk.length).to.equal(14);
     })
   })
   context('add players', () => {
@@ -105,6 +105,7 @@ describe('#game()', function () {
       let cnt = game.countGroupOwnership(7, 'darkblue');
       expect(cnt).to.equal(1);
       let rent = game.getRent('boardwalk', 3);
+      console.log("--------------" + rent)
       expect(rent).to.equal(50);
       game.assignOwnership(9, 'parkplace');
       rent = game.getRent('parkplace', 3);
@@ -209,86 +210,86 @@ describe('#game()', function () {
 
   context('Player Position testing',() => {
     it('Cross go and get 200 added to wallet',async()=> {
-      game.setPlayers(1,2,3,4);
-      game.getPlayerPosition(4);
-      expect(game.getPlayerPosition(5)).to.equal(null);
-      expect(game.getPlayerPosition(1)).to.equal(0)
-      game.setPlayerPosition(1,39);
-      expect(game.getPlayerPosition(1)).to.equal(39)
-      game.doMove(1,1)
-      expect(game.getPlayerPosition(1)).to.equal(0)
-      expect(game.getWallet(1)).to.equal(1700)
+      game.setPlayers("a","b","c","d");
+      game.getPlayerPosition("a");
+      expect(game.getPlayerPosition("e")).to.equal(null);
+      expect(game.getPlayerPosition("b")).to.equal(0)
+      game.setPlayerPosition("b",39);
+      expect(game.getPlayerPosition("b")).to.equal(39)
+      game.doMove("b",1)
+      expect(game.getPlayerPosition("b")).to.equal(0)
+      expect(game.getWallet("b")).to.equal(1700)
     })
     it('Land on owned property get wallet deducted.',async()=> {
     })
     it('Land on go to jail square.',async()=> {
-      game.setPlayers(1,2,3,4);
-      game.doMove(1,30)
-      expect(game.getPlayerPosition(1)).to.equal(10)
-      expect(game.inJail(1)).to.equal(true);
+      game.setPlayers("a","b","c","d");
+      game.doMove("a",30)
+      expect(game.getPlayerPosition("a")).to.equal(10)
+      expect(game.inJail("a")).to.equal(true);
     })
     it('Move three spaces back card',async()=> {
     })
   })
-  context('Apply Community chest and chance cards',() => {
+  context('Apply Community chest and risk cards',() => {
     it('Apply move cards',async() => {
-      game.setPlayers(1,2,3,4);
-      expect(game.getWallet(1)).to.equal(1500)
-      game.activateMoveCard(1, 'go')
-      expect(game.getWallet(1)).to.equal(1700)
-      expect(game.getPlayerPosition(1)).to.equal(0)
-      game.activateMoveCard(1, 'boardwalk')
-      expect(game.getWallet(1)).to.equal(1700)
-      expect(game.getPlayerPosition(1)).to.equal(39)
+      game.setPlayers("a","b","c","d");
+      expect(game.getWallet("a")).to.equal(1500)
+      game.activateMoveCard("a", 'go')
+      expect(game.getWallet("a")).to.equal(1700)
+      expect(game.getPlayerPosition("a")).to.equal(0)
+      game.activateMoveCard("a", 'boardwalk')
+      expect(game.getWallet("a")).to.equal(1700)
+      expect(game.getPlayerPosition("a")).to.equal(39)
     })
     it('Apply move nearest card',async() => {
-      game.setPlayers(1,2,3,4);
-      expect(game.getWallet(1)).to.equal(1500)
-      game.activateMoveCard(1, 'go')
-      expect(game.getWallet(1)).to.equal(1700)
-      expect(game.getPlayerPosition(1)).to.equal(0)
-      game.activateMoveCard(1, 'boardwalk')
-      expect(game.getWallet(1)).to.equal(1700)
-      expect(game.getPlayerPosition(1)).to.equal(39)
+      game.setPlayers("a","b","c","d");
+      expect(game.getWallet("a")).to.equal(1500)
+      game.activateMoveCard("a", 'go')
+      expect(game.getWallet("a")).to.equal(1700)
+      expect(game.getPlayerPosition("a")).to.equal(0)
+      game.activateMoveCard("a", 'boardwalk')
+      expect(game.getWallet("a")).to.equal(1700)
+      expect(game.getPlayerPosition("a")).to.equal(39)
 
-      game.setPlayerPosition(2,4);
-      game.activateMoveNearestCard(2,'Utilities');
-      expect(game.getPlayerPosition(2)).to.equal(12);
+      game.setPlayerPosition("b",4);
+      game.activateMoveNearestCard("b",'Utilities');
+      expect(game.getPlayerPosition("b")).to.equal(12);
 
-      game.setPlayerPosition(2,20)
-      game.activateMoveNearestCard(2,'Utilities');
-      expect(game.getPlayerPosition(2)).to.equal(28);
+      game.setPlayerPosition("b",20)
+      game.activateMoveNearestCard("b",'Utilities');
+      expect(game.getPlayerPosition("b")).to.equal(28);
 
-      game.setPlayerPosition(2,30)
-      game.activateMoveNearestCard(2,'Utilities');
-      expect(game.getPlayerPosition(2)).to.equal(12);
+      game.setPlayerPosition("b",30)
+      game.activateMoveNearestCard("b",'Utilities');
+      expect(game.getPlayerPosition("b")).to.equal(12);
 
-      game.setPlayerPosition(2,8)
-      game.activateMoveNearestCard(2,'Railroad');
-      expect(game.getPlayerPosition(2)).to.equal(15);
+      game.setPlayerPosition("b",8)
+      game.activateMoveNearestCard("b",'Railroad');
+      expect(game.getPlayerPosition("b")).to.equal(15);
 
-      game.setPlayerPosition(2,20)
-      game.activateMoveNearestCard(2,'Railroad');
-      expect(game.getPlayerPosition(2)).to.equal(25);
+      game.setPlayerPosition("b",20)
+      game.activateMoveNearestCard("b",'Railroad');
+      expect(game.getPlayerPosition("b")).to.equal(25);
 
-      game.setPlayerPosition(2,30)
-      game.activateMoveNearestCard(2,'Railroad');
-      expect(game.getPlayerPosition(2)).to.equal(35);
+      game.setPlayerPosition("b",30)
+      game.activateMoveNearestCard("b",'Railroad');
+      expect(game.getPlayerPosition("b")).to.equal(35);
 
-      game.setPlayerPosition(2,1)
-      game.activateMoveNearestCard(2,'Railroad');
-      expect(game.getPlayerPosition(2)).to.equal(5);
+      game.setPlayerPosition("b",1)
+      game.activateMoveNearestCard("b",'Railroad');
+      expect(game.getPlayerPosition("b")).to.equal(5);
 
-      game.setPlayerPosition(2,1)
-      game.activateMoveNearestCard(2,'Railroad');
-      expect(game.getPlayerPosition(2)).to.equal(5);
+      game.setPlayerPosition("b",1)
+      game.activateMoveNearestCard("b",'Railroad');
+      expect(game.getPlayerPosition("b")).to.equal(5);
     })
     it('Apply go to jail card',async() => {
 
-      game.setPlayers(1,2,3,4);
-      game.setPlayerPosition(2,1)
+      game.setPlayers("a","b","c","d");
+      game.setPlayerPosition("b",1)
       game.activateJailCard(2);
-      expect(game.getPlayerPosition(2)).to.equal(10)
+      expect(game.getPlayerPosition("b")).to.equal(10)
       expect(game.inJail(2)).to.equal(true);
       game.releaseFromJail(2);
       expect(game.inJail(2)).to.equal(false);

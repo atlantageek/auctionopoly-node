@@ -76,7 +76,8 @@ class Property extends Card {
         return true;
     }
     current_rent(owned_in_group, last_dice_roll = 0) {
-        if (this.mortgaged) return 0;
+        if (this.is_mortgaged()) return 0;
+   
         if (this.house_count > 0 && this._multipliedrent != null) return this._multipliedrent[housecount - 1];
         if (this.group == 'Railroad') {
             if (owned_in_group == 1) return 25;
@@ -88,7 +89,6 @@ class Property extends Card {
             if (owned_in_group == 1) return last_dice_roll * 4;
             if (owned_in_group == 2) return last_dice_roll * 10;
         }
-
         if ((this.group == "Purple" || this.group == "darkblue") && owned_in_group == 2) return this._rent * 2;
         if (owned_in_group == 3) return this._rent * 3;
         else return this._rent;
@@ -110,8 +110,8 @@ class Game {
     player_wallets = [];
     player_in_jail = [];
     board = [];
-    community_chest = [];
-    chance = [];
+    reward = [];
+    risk = [];
     constructor() {
     }
     async initialize() {
@@ -124,9 +124,8 @@ class Game {
                 if (property['group'] == 'special') return new Event(property)
                 return new Property(property);
             })
-            this.chance = parsed_data['chance'];
-            console.log(this.communitychest);
-            this.community_chest = parsed_data['communitychest']
+            this.risk = parsed_data['risk'];
+            this.reward = parsed_data['reward']
             if (data) return this;
             return false;
         }
@@ -189,6 +188,7 @@ class Game {
         let property = this.getProperty(property_id)
 
         let owner = property.owned_by;
+
         if (owner == -1 || owner == null) return 0;
         let owner_cnt = this.countGroupOwnership(owner, property.group);
         return property.current_rent(owner_cnt, roll)
@@ -271,7 +271,6 @@ class Game {
     sendPlayerToJail(player_id) {
         let player_idx = this.getPlayerIdx(player_id);
         this.setPlayerPosition(player_id, 10);
-        console.log(this.player_positions[player_idx]);
         this.player_in_jail[player_idx] = true;
     }
     releaseFromJail(player_id) {
@@ -342,10 +341,10 @@ class Game {
             return;
         }
 
-        // if (property_id=='chance'){
+        // if (property_id=='risk'){
         //     return;
         // }
-        // else if (property_id=='communitychest') {
+        // else if (property_id=='reward') {
         //     return;
         // }
         // else 

@@ -98,13 +98,13 @@ const redirectHome = (req, res, next) => {
 app.ws('/ws', function(ws, req) {
     ws.on('message', function(msg) {
       console.log(msg);
-      setInterval(() => {
-        game.moveBy(1,1);
-        game.moveBy(2,2);
-        game.moveBy(3,3);
-        game.moveBy(4,4);
-        ws.send(JSON.stringify(game))
-      },4000)
+    //   setInterval(() => {
+    //     game.moveBy(1,1);
+    //     game.moveBy(2,2);
+    //     game.moveBy(3,3);
+    //     game.moveBy(4,4);
+    //     ws.send(JSON.stringify(game))
+    //   },4000)
     });   
     console.log('socket', req.testing);
   });
