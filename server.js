@@ -323,3 +323,29 @@ hbs.registerHelper("mortgageColor", function (id) {
     if (id) return property.is_mortgaged() ? "red" : "blue";
     return "white"
 }); 
+
+
+//Game State Machine
+//Users Join Game
+//Are there 4 players?
+//If yet enable start button
+//Time start for all 4 players.
+//Start game.  Lock new players from joining
+//while (>1 player have positive network)
+//*pick next player
+//*Player In jail?{
+//* No Pay 50? {
+//*    try double roll if roll double then do move
+//* }
+//* Pay 50 {
+//*   charge 50
+//*   Play Normal turn
+//*}
+//* NORMAL TURN:
+//** Do Roll
+//*  Move
+//* If project not owned then auction
+
+
+//Start with first player and roll their dice
+//
