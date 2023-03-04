@@ -288,11 +288,11 @@ describe('#game()', function () {
 
       game.setPlayers("a","b","c","d");
       game.setPlayerPosition("b",1)
-      game.activateJailCard(2);
+      game.activateJailCard("b");
       expect(game.getPlayerPosition("b")).to.equal(10)
-      expect(game.inJail(2)).to.equal(true);
-      game.releaseFromJail(2);
-      expect(game.inJail(2)).to.equal(false);
+      expect(game.inJail("b")).to.equal(true);
+      game.releaseFromJail("b");
+      expect(game.inJail("b")).to.equal(false);
     })
     it('Apply property charges', async () => {
       game.assignOwnership(9, 'parkplace');
