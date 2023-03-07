@@ -21,28 +21,29 @@ const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
  
 app.use(cors()); 
+player_sockets=[];
    
 //setup Game Object
 let game = new Game();
 game.initialize().then((gobj) => {
-    gobj.setPlayers(1, 2, 3, 4) 
-    gobj.assignOwnership(2, 'boardwalk');
-    gobj.assignOwnership(2, 'parkplace');
-    gobj.assignOwnership(3, 'mediterraneanave');
+    // gobj.setPlayers(1, 2, 3, 4) 
+    // gobj.assignOwnership(2, 'boardwalk');
+    // gobj.assignOwnership(2, 'parkplace');
+    // gobj.assignOwnership(3, 'mediterraneanave');
 
-    let property = game.getProperty('boardwalk');
-    let property2 = game.getProperty('parkplace');
-    let mort_property=game.getProperty('mediterraneanave')
-    property.add_house(); 
-    property2.add_house(); 
-    property.add_house(); 
-    property2.add_house(); 
-    property.add_house(); 
-    property2.add_house(); 
-    property.add_house();  
-    property2.add_house(); 
-    property.add_house(); 
-    mort_property.mortgaged(true)
+    // let property = game.getProperty('boardwalk');
+    // let property2 = game.getProperty('parkplace');
+    // let mort_property=game.getProperty('mediterraneanave')
+    // property.add_house(); 
+    // property2.add_house(); 
+    // property.add_house(); 
+    // property2.add_house(); 
+    // property.add_house(); 
+    // property2.add_house(); 
+    // property.add_house();  
+    // property2.add_house(); 
+    // property.add_house(); 
+    // mort_property.mortgaged(true)
 })   
 const PORT = process.env.APP_PORT;
 const IN_PROD = process.env.NODE_ENV === 'production'
@@ -85,7 +86,7 @@ const redirectLogin = (req, res, next) => {
     } else {
         next()
     }
-}
+} 
    
 const redirectHome = (req, res, next) => {
     if (req.session.email) {
@@ -97,26 +98,39 @@ const redirectHome = (req, res, next) => {
   
 app.ws('/ws', function(ws, req) {
     ws.on('message', function(msg) {
-      console.log(msg);
-    //   setInterval(() => {
-    //     game.moveBy(1,1);
-    //     game.moveBy(2,2);
-    //     game.moveBy(3,3);
-    //     game.moveBy(4,4);
-    //     ws.send(JSON.stringify(game))
-    //   },4000)
+      let msgObj=JSON.parse(msg);
+      //register msg should have a user account, name associated with it.
+      if (msgObj.msgType=='register'){
+        if (!game.open) {
+            ws.send(JSON.stringify({msgType:'ERROR',errMsg:'Game is closed',kickout:true}));
+            return;
+        }
+        if (!msgObj.hasOwnProperty('name') || !msgObj.hasOwnProperty('user')) {
+            ws.send(JSON.stringify({msgType:'Error',errMsg:'Name and account are required'}));
+            return;
+        }
+        console.log('Adding Player' + req.session.email)
+        game.addPlayer(req.session.email,req.session.email);
+        player_sockets.push(ws);
+      }
+      if (msgObj.msgType=='startGame') {
+        if (game.startGame()) startGame();
+      } 
+      console.log('MSG' + msg);
+      setInterval(() => {
+        ws.send(JSON.stringify({gamestate:game, player:req.session.email, msgType:'update'}))
+      },1000)
     });   
-    console.log('socket', req.testing);
   });
-
+  
 app.get('/', (req, res) => {
     const { email } = req.session
     console.log(email);
     res.render('index', {
         email: email
-    })
+    })  
 }) 
- 
+  
 app.get('/home', redirectLogin, async (req, res) => {
     const { email } = req.session
     console.log(email);
@@ -128,7 +142,7 @@ app.get('/home', redirectLogin, async (req, res) => {
                 //req.user = obj;
                 res.send(`
         <h1>Home</h1>
-        <a href='/'>Main</a>
+        <a href='/board'>Play</a>
         <ul>
         <li> Name: ${obj.first_name} </li>
         <li> Email:${obj.email} </li>
@@ -154,17 +168,20 @@ app.get('/login', redirectHome, (req, res) => {
     </form>
     <a href='/register'>Register</a>
     `)
-})
+}) 
 
 app.get('/board', async (req, res) => {
-    console.log("Board")
+    if (!req.session.email) {
+        res.redirect('/login')
+    }
+   
     let data = await fs.promises.readFile('monopoly.json');
     let parsed_data = JSON.parse(data);
     res.render('board', {
-        tiles: parsed_data['tiles']
+        tiles: parsed_data['tiles'],email:req.session.email
     })
+    console.log("Boardx")
 })
-  
 
 app.get('/register', redirectHome, (req, res) => {
     console.log("hi")
@@ -237,8 +254,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
         const salt = genSaltSync(10);
         password = hashSync(password, salt);
 
-        console.log("HSET")
-        console.log(redisClient)
+
         let result = await redisClient.hset('account:' + email, {
             'first_name': firstName,
             'last_name': lastName,
@@ -253,7 +269,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
         //     res.redirect('/register');
 
         // });
-        console.log(result);
+      
         res.redirect('/home')
 
 
@@ -324,7 +340,26 @@ hbs.registerHelper("mortgageColor", function (id) {
     return "white"
 }); 
 
+function rollDice() {
+    let die1 = Math.floor(Math.random()*6)+1;
+    let die2 = Math.floor(Math.random()*6)+1; 
+    return die1+die2;
+}
+function processPlayer(player) {
+    let player_idx=game.getPlayerIdx(player);
+    //Do stuff
+    let move=rollDice();
+    game.moveBy(player,move);
+    console.log(player_sockets.length);
+    console.log('Player Idx: ' + player_idx)
+    player_sockets[player_idx].send(JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name}));
 
+}
+function startGame() {
+    console.log("Starting Game")
+    let player = game.getCurrentPlayer();
+    processPlayer(player);
+}
 //Game State Machine
 //Users Join Game
 //Are there 4 players?
@@ -348,4 +383,3 @@ hbs.registerHelper("mortgageColor", function (id) {
 
 
 //Start with first player and roll their dice
-//

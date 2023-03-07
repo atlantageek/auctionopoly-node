@@ -51,39 +51,55 @@
       {"id": "luxurytax"},
       {"id": "boardwalk"}
     ]
+    let ws=null;
         function init() {
             console.log("LOADED")
             $(".balticave .secondhouse").css("visibility", "visible");
+            $("#iam").text('{{email}}')
             const socketProtocol = (window.location.protocol === 'https:' ? 'wss:' : 'ws:')
             const echoSocketUrl = socketProtocol + '//' + window.location.hostname + ':' + window.location.port + '/ws'
-            const ws = new WebSocket(echoSocketUrl);
+            ws = new WebSocket(echoSocketUrl);
             ws.addEventListener("open", () => {
                 console.log("We are connected");
-                ws.send("How are you?");
+                ws.send(JSON.stringify({'msgType':'register','name':'{{email}}', 'user':'{{email}}' }))
             });
             ws.addEventListener('message', (msg) => {
-
-                console.log(msg);
                 let obj = JSON.parse(msg.data);
-                console.log(obj.board)
-                populateBoard(obj.board, obj.player_list);
-                populatePlayers(obj.player_names, obj.player_wallets,obj.player_positions,obj.board);
+                let gamestate=obj.gamestate;
+                let player=obj.player;
+                populateBoard(gamestate.board, gamestate.player_list);
+                populatePlayers(gamestate.player_names, gamestate.player_wallets,gamestate.player_positions,gamestate.board);
+                console.log('Player:' + player)
+                if (obj.msgType =='update') {
+                    console.log("Just an update");
+                }
+                if (obj.msgType == 'dosomething') {
+                    console.log("do something");
+                    alert("Hey do something.")
+                }
             });
         };
-        function populatePlayers(player_names,player_wallets, player_positions,) {
+        function startGame() {
+            console.log("Button Click")
+            ws.send(JSON.stringify({msgType:'startGame'}))
+        }
+        function populatePlayers(player_names,player_wallets, player_positions) {
             for (let i=0;i<player_names.length;i++) {
                 let player_id = '#player' + (i+1);
                 $(player_id+' .name').text(player_names[i]);
                 $(player_id + ' .account').text(player_wallets[i]);
 
             }
-            for (let i=0;i<40;i++) {
+            for (let i=0;i<40;i++) { 
                 for (let j=0;j<player_names.length;j++) {
-                    console.log('IDzX: ' + i)
                     let selector = '.' + tiles[i].id + " .player" + (j+1);
                     if (player_positions[j] == i) $(selector).css("visibility", "visible");
                     else $(selector).css("visibility", "hidden");
                     
+                }
+                for (let j=player_names.length;j<4;j++) {
+                    let selector = '.' + tiles[i].id + " .player" + (j+1);
+                    $(selector).css("visibility", "hidden");
                 }
             }
             
@@ -228,10 +244,13 @@
             </div>
         </div>
         <div class="player_list">
+            <div>I am <span id="iam">whoami</span></div> 
+            <div>{{email}}</div> 
             <div id="player1" class="player_details"><div class="name">Player1</div><div class="account"></div></div>
             <div id="player2" class="player_details" ><div class="name">Player2</div><div class="account"></div></div>
             <div id="player3" class="player_details"><div class="name">Player3</div><div class="account"></div></div>
             <div id="player4" class="player_details"><div class="name">Player4</div><div class="account"></div></div>
+            <button onclick="startGame()">Start Game</button>
         </div>
     </div>
 </body>

@@ -109,9 +109,19 @@ class Game {
     player_positions = [];
     player_wallets = [];
     player_in_jail = [];
+    
     board = [];
     reward = [];
     risk = [];
+    _game_started=false;
+    get open() {
+        if (this.player_names.length >=4) return false;
+        return true;
+    }
+    get game_started() {
+        //if (this.open)return false;
+        return _game_started;
+    }
     constructor() {
     }
     async initialize() {
@@ -134,8 +144,28 @@ class Game {
         }
 
     }
+    startGame() {
+        if (!this._game_started) {
+            this._game_started=true;
+            return true;
+        }
+        return false;
+    }
     nextTurn() {
         this.turn++;
+    }
+    getCurrentPlayer() {
+        let player_idx = this.turn % this.player_list.length;
+        return player_list[player_idx];
+    }
+    addPlayer(player,name) {
+        if (this.open){
+            this.player_list.push(player);
+            this.player_positions.push(0);
+            this.player_wallets.push(1500);
+            this.player_in_jail.push(false);
+            this.player_names.push(name);
+        }
     }
     setPlayers(player1, player2, player3, player4) {
         this.player_list = [player1, player2, player3, player4];
