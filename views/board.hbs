@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script defer>
         let player_colors = ['lightgreen', 'lightblue', 'pink', 'yellow']
+        let player_ready=false;
         let tiles= [
       {"id": "go"},
       {"id": "mediterraneanave"},
@@ -75,13 +76,24 @@
                 }
                 if (obj.msgType == 'dosomething') {
                     console.log("do something");
-                    alert("Hey do something.")
+                    player_ready=true;
+                    getInput();
+              
+                    $("#done_button").prop('disabled',false)
                 }
             });
         };
         function startGame() {
             console.log("Button Click")
             ws.send(JSON.stringify({msgType:'startGame'}))
+            $("#start_game_button").prop('disabled', true);
+        }
+        function getInput() {
+
+        }
+        function done() {
+            ws.send(JSON.stringify({msgType:'done'}));
+            $("#done_button").prop('disabled', true);
         }
         function populatePlayers(player_names,player_wallets, player_positions) {
             for (let i=0;i<player_names.length;i++) {
@@ -250,7 +262,8 @@
             <div id="player2" class="player_details" ><div class="name">Player2</div><div class="account"></div></div>
             <div id="player3" class="player_details"><div class="name">Player3</div><div class="account"></div></div>
             <div id="player4" class="player_details"><div class="name">Player4</div><div class="account"></div></div>
-            <button onclick="startGame()">Start Game</button>
+            <button id="start_game_button" onclick="startGame()">Start Game</button>
+            <button id="done_button" onclick="done()" disabled>Done</button>
         </div>
     </div>
 </body>

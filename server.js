@@ -114,7 +114,14 @@ app.ws('/ws', function(ws, req) {
         player_sockets.push(ws);
       }
       if (msgObj.msgType=='startGame') {
+        console.log("try start game.")
         if (game.startGame()) startGame();
+      } 
+      if (msgObj.msgType=='done') {
+        console.log("try start game.")
+        game.nextTurn();
+        let player = game.getCurrentPlayer();
+        processPlayer(player);
       } 
       console.log('MSG' + msg);
       setInterval(() => {
@@ -353,7 +360,7 @@ function processPlayer(player) {
     console.log(player_sockets.length);
     console.log('Player Idx: ' + player_idx)
     player_sockets[player_idx].send(JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name}));
-
+ 
 }
 function startGame() {
     console.log("Starting Game")
