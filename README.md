@@ -28,3 +28,9 @@ Other possible rule changes.
 - index.html - pairs with ws-server.js to test web sockets.
 
 All functions will go through Game object.
+
+## TODO
+- build ai or agent to play auctionopoly, would be nice if it learned.
+-- agent keeps bidding until he wins or the bid is more than mortgage price or mortgage is less than value but value is less than account
+- Identify user decisions bid/nobid, buy house, sell house, mortgage property, winning/losing condition... these will be messages for the user
+- should be simple enough to recreate capability of existing bots
