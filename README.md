@@ -30,6 +30,8 @@ Other possible rule changes.
 All functions will go through Game object.
 
 ## TODO
+- recognize ownership and act accordingly. including auction
+
 - build ai or agent to play auctionopoly, would be nice if it learned.
 -- agent keeps bidding until he wins or the bid is more than mortgage price or mortgage is less than value but value is less than account
 - Identify user decisions bid/nobid, buy house, sell house, mortgage property, winning/losing condition... these will be messages for the user
