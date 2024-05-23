@@ -19,6 +19,21 @@ describe('#game()', function () {
     })
   })
   context('add players', () => {
+    it('should allow only unique players', async () => {
+      expect(game.player_list.length).to.equal(0)
+      var r=game.addPlayer('a','b');
+      expect(r).to.equal(true);
+      expect(game.player_list.length).to.equal(1)
+      r=game.addPlayer('c','b');
+      expect(r).to.equal(true);
+      expect(game.player_list.length).to.equal(2)
+      r=game.addPlayer('a','b');
+      expect(r).to.equal(false);
+      expect(game.player_list.length).to.equal(2)
+
+    })
+  })
+  context('set players', () => {
     it('should return 4 players', async () => {
 
       game.setPlayers(1, 2, 3, 4);

@@ -160,11 +160,14 @@ class Game {
     }
     addPlayer(player,name) {
         if (this.open){
+            var idx=this.player_list.findIndex(p=>p==player);
+            if (idx != -1) return false;
             this.player_list.push(player);
             this.player_positions.push(0);
             this.player_wallets.push(1500);
             this.player_in_jail.push(false);
             this.player_names.push(name);
+            return true;
         }
     }
     setPlayers(player1, player2, player3, player4) {

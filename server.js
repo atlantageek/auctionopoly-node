@@ -359,7 +359,8 @@ function processPlayer(player) {
     game.moveBy(player,move);
     console.log(player_sockets.length);
     console.log('Player Idx: ' + player_idx)
-    player_sockets[player_idx].send(JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name}));
+    var jsonMsg = JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name})
+    player_sockets[player_idx].send(jsonMsg);
  
 }
 function startGame() {
