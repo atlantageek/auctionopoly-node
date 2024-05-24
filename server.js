@@ -26,14 +26,14 @@ player_sockets=[];
 //setup Game Object
 let game = new Game();
 game.initialize().then((gobj) => {
-    // gobj.setPlayers(1, 2, 3, 4) 
-    // gobj.assignOwnership(2, 'boardwalk');
-    // gobj.assignOwnership(2, 'parkplace');
-    // gobj.assignOwnership(3, 'mediterraneanave');
+    // gobj.set_players(1, 2, 3, 4) 
+    // gobj.assign_ownership(2, 'boardwalk');
+    // gobj.assign_ownership(2, 'parkplace');
+    // gobj.assign_ownership(3, 'mediterraneanave');
 
-    // let property = game.getProperty('boardwalk');
-    // let property2 = game.getProperty('parkplace');
-    // let mort_property=game.getProperty('mediterraneanave')
+    // let property = game.get_property('boardwalk');
+    // let property2 = game.get_property('parkplace');
+    // let mort_property=game.get_property('mediterraneanave')
     // property.add_house(); 
     // property2.add_house(); 
     // property.add_house(); 
@@ -110,17 +110,17 @@ app.ws('/ws', function(ws, req) {
             return;
         }
         console.log('Adding Player' + req.session.email)
-        game.addPlayer(req.session.email,req.session.email);
+        game.add_player(req.session.email,req.session.email);
         player_sockets.push(ws);
       }
-      if (msgObj.msgType=='startGame') {
+      if (msgObj.msgType=='start_game') {
         console.log("try start game.")
-        if (game.startGame()) startGame();
+        if (game.start_game()) start_game();
       } 
       if (msgObj.msgType=='done') {
         console.log("try start game.")
-        game.nextTurn();
-        let player = game.getCurrentPlayer();
+        game.next_turn();
+        let player = game.get_current_player();
         processPlayer(player);
       } 
       console.log('MSG' + msg);
@@ -310,39 +310,39 @@ function getContext(id) {
     return { name: 'great', orientation: '180deg', group: 'red' }
 }
   
-hbs.registerHelper("getProperty", function (id) {
+hbs.registerHelper("get_property", function (id) {
     return "tile name='greatestever' group=green orientation=90deg"
 });
 hbs.registerHelper("getHouseCount", function (id) {
     return '333333'
 });
 hbs.registerHelper("firstHouse", function (id) {
-    let property = game.getProperty(id);
+    let property = game.get_property(id);
     if (id) return property.house_count >=1 && property.house_count <5
     return false
 });
 hbs.registerHelper("secondHouse", function (id) {
-    let property = game.getProperty(id);
+    let property = game.get_property(id);
     if (id) return property.house_count >=2 && property.house_count <5
     return false
 });
 hbs.registerHelper("thirdHouse", function (id) {
-    let property = game.getProperty(id);
+    let property = game.get_property(id);
     if (id) return property.house_count >=3 && property.house_count <5
     return false
 }); 
 hbs.registerHelper("fourthHouse", function (id) {
-    let property = game.getProperty(id);
+    let property = game.get_property(id);
     if (id) return property.house_count >=4 && property.house_count <5
     return false 
 });
 hbs.registerHelper("hotel", function (id) {
-    let property = game.getProperty(id); 
+    let property = game.get_property(id); 
     if (id) return property.house_count == 5 
     return false
 });
 hbs.registerHelper("mortgageColor", function (id) {
-    let property = game.getProperty(id); 
+    let property = game.get_property(id); 
     if (id) return property.is_mortgaged() ? "red" : "blue";
     return "white"
 }); 
@@ -353,19 +353,31 @@ function rollDice() {
     return die1+die2;
 }
 function processPlayer(player) {
-    let player_idx=game.getPlayerIdx(player);
-    //Do stuff
+    let player_idx=game.get_player_idx(player);
+    if (game.in_jail(player)){
+        
+    }
+    //If player is in jail then ask if they want to pay or roll
+    //If not pay then roll for double {
+        //If double then move
+    //}
+    //else If pay then allow move {
     let move=rollDice();
-    game.moveBy(player,move);
-    console.log(player_sockets.length);
-    console.log('Player Idx: ' + player_idx)
+    //}
+
+
+    game.move_by(player,move);
+    // Get property player is on
+    //If property is available start bidding subfunction
+    //If property is owned... trigger rent pay
+    //If property is a function then do the function.
     var jsonMsg = JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name})
     player_sockets[player_idx].send(jsonMsg);
  
 }
-function startGame() {
+function start_game() {
     console.log("Starting Game")
-    let player = game.getCurrentPlayer();
+    let player = game.get_current_player();
     processPlayer(player);
 }
 //Game State Machine

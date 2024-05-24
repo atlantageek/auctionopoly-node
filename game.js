@@ -144,21 +144,21 @@ class Game {
         }
 
     }
-    startGame() {
+    start_game() {
         if (!this._game_started) {
             this._game_started=true;
             return true;
         }
         return false;
     }
-    nextTurn() {
+    next_turn() {
         this.turn++;
     }
-    getCurrentPlayer() {
+    get_current_player() {
         let player_idx = this.turn % this.player_list.length;
         return player_list[player_idx];
     }
-    addPlayer(player,name) {
+    add_player(player,name) {
         if (this.open){
             var idx=this.player_list.findIndex(p=>p==player);
             if (idx != -1) return false;
@@ -170,91 +170,91 @@ class Game {
             return true;
         }
     }
-    setPlayers(player1, player2, player3, player4) {
+    set_players(player1, player2, player3, player4) {
         this.player_list = [player1, player2, player3, player4];
         this.player_positions = [0, 0, 0, 0];
         this.player_wallets = [1500, 1500, 1500, 1500];
-        this.player_injail = [false, false, false, false]
+        this.player_in_jail = [false, false, false, false]
         this.player_names=['Bob1','Eve2','William3','Jenny4']
         //randomize players;
-        //this.randomizePlayers();
+        //this.randomize_players();
     }
-    getPlayerIdx(player_id) {
+    get_player_idx(player_id) {
         return this.player_list.findIndex(p => p == player_id);
     }
-    getTileIdx(property_id) {
+    get_tile_idx(property_id) {
         let property_idx = this.board.findIndex(t => t.id == property_id)
 
         return property_idx;
     }
-    getProperty(property_id) {
-        let property_idx = this.getTileIdx(property_id)
+    get_property(property_id) {
+        let property_idx = this.get_tile_idx(property_id)
         let p = this.board[property_idx];
         return p;
     }
-    assignOwnership(owner_id, property_id) {
-        let property_idx = this.getTileIdx(property_id)
+    assign_ownership(owner_id, property_id) {
+        let property_idx = this.get_tile_idx(property_id)
         this.board[property_idx].owned_by = owner_id;
     }
-    randomizePlayers() {
+    randomize_players() {
         this.player_list = this.player_list.sort(() => (Math.random() > 0.5) ? 1 : -1);
     }
-    getCurrentPlayer() {
+    get_current_player() {
         let pos = this.turn % this.player_list.length;
         return this.player_list[pos];
     }
-    getIdsByGroup(groupName) {
+    get_ids_by_group(groupName) {
         let groupList = this.board.filter(p => p.group == groupName).map(p => p.id);
         return groupList;
     }
     //Full group ownership doubles rent.  Also decides if we can build houses on property.
-    checkGroupOwnership(group_name) {
-        let owner_list = this.getIdsByGroup(group_name).map(property_id => {
-            let p = this.getProperty(property_id);
+    check_group_ownership(group_name) {
+        let owner_list = this.get_ids_by_group(group_name).map(property_id => {
+            let p = this.get_property(property_id);
             return p.owned_by
         })
         if (owner_list.length == 0) return false;
 
         return !!owner_list.reduce((a, b) => ((a === b) ? a : NaN));
     }
-    getRent(property_id, roll) {
-        let property = this.getProperty(property_id)
+    get_rent(property_id, roll) {
+        let property = this.get_property(property_id)
 
         let owner = property.owned_by;
 
         if (owner == -1 || owner == null) return 0;
-        let owner_cnt = this.countGroupOwnership(owner, property.group);
+        let owner_cnt = this.count_group_ownership(owner, property.group);
         return property.current_rent(owner_cnt, roll)
     }
     //Used to calculate rent for Utilities and Railroads
-    countGroupOwnership(player_id, group_name) {
-        return this.getIdsByGroup(group_name).reduce((cnt, property_id) => {
+    count_group_ownership(player_id, group_name) {
+        return this.get_ids_by_group(group_name).reduce((cnt, property_id) => {
 
-            let property = this.getProperty(property_id);
+            let property = this.get_property(property_id);
             return property.owned_by == player_id ? cnt + 1 : cnt;
         }, 0)
     }
-    getPlayerPosition(player_id) {
-        let player_idx = this.getPlayerIdx(player_id);
+    get_player_position(player_id) {
+        let player_idx = this.get_player_idx(player_id);
         if (player_idx == -1) return null;
         return this.player_positions[player_idx];
     }
-    setPlayerPosition(player_id, pos) {
+    set_player_position(player_id, pos) {
         let player_idx = this.player_list.findIndex(p => p == player_id);
         this.player_positions[player_idx] = pos;
     }
-    moveBy(player_id, cnt) {
+    move_by(player_id, cnt) {
         let player_idx = this.player_list.findIndex(p => p == player_id);
         let pos = this.player_positions[player_idx];
         pos = (pos + cnt) % 40;
         this.player_positions[player_idx] = pos
         return pos;
     }
-    addHouse(property_id) {
-        let target_p = this.getProperty(property_id);
-        if (!this.checkGroupOwnership(target_p.group)) return false
-        let house_counts = this.getIdsByGroup(target_p.group).map(pid => {
-            let p = this.getProperty(pid)
+    add_house(property_id) {
+        let target_p = this.get_property(property_id);
+        if (!this.check_group_ownership(target_p.group)) return false
+        let house_counts = this.get_ids_by_group(target_p.group).map(pid => {
+            let p = this.get_property(pid)
             return p.house_count
         })
 
@@ -265,11 +265,11 @@ class Game {
         if (target_p.house_count >= 5) return false;
         return target_p.add_house();
     }
-    removeHouse(property_id) {
-        let target_p = this.getProperty(property_id);
-        if (!this.checkGroupOwnership(target_p.group)) return false
-        let house_counts = this.getIdsByGroup(target_p.group).map(pid => {
-            let p = this.getProperty(pid)
+    remove_house(property_id) {
+        let target_p = this.get_property(property_id);
+        if (!this.check_group_ownership(target_p.group)) return false
+        let house_counts = this.get_ids_by_group(target_p.group).map(pid => {
+            let p = this.get_property(pid)
             return p.house_count
         })
         let min_count = Math.min(...house_counts);
@@ -280,7 +280,7 @@ class Game {
     }
     #TODO
     //Roll 1 or 2 die
-    rollDie(die_count) {
+    roll_die(die_count) {
         //die_count 1 or 2
         let result = Math.floor(Math.random() * 6) + 1;
         if (die_count == 2) {
@@ -288,53 +288,53 @@ class Game {
         }
         return result;
     }
-    rollPlayerDie(player_id, die_count) {
-        let move_count = this.rollDie(die_count);
-        let property_id = this.moveBy(player_id, move_count)
+    roll_player_die(player_id, die_count) {
+        let move_count = this.roll_die(die_count);
+        let property_id = this.move_by(player_id, move_count)
         return property_id;
     }
-    getWallet(player_id) {
-        let player_idx = this.getPlayerIdx(player_id);
+    get_wallet(player_id) {
+        let player_idx = this.get_player_idx(player_id);
         return this.player_wallets[player_idx]
     }
-    inJail(player_id) {
-        let player_idx = this.getPlayerIdx(player_id);
+    in_jail(player_id) {
+        let player_idx = this.get_player_idx(player_id);
         return this.player_in_jail[player_idx]
     }
-    sendPlayerToJail(player_id) {
-        let player_idx = this.getPlayerIdx(player_id);
-        this.setPlayerPosition(player_id, 10);
+    send_player_to_jail(player_id) {
+        let player_idx = this.get_player_idx(player_id);
+        this.set_player_position(player_id, 10);
         this.player_in_jail[player_idx] = true;
     }
-    releaseFromJail(player_id) {
-        let player_idx = this.getPlayerIdx(player_id);
+    release_from_jail(player_id) {
+        let player_idx = this.get_player_idx(player_id);
         this.player_in_jail[player_idx] = false;
     }
-    activateMoveCard(player_id, tile_id) {
-        let tile_idx = this.getTileIdx(tile_id);
-        let player_pos = this.getPlayerPosition(player_id);
-        let player_idx = this.getPlayerIdx(player_id)
+    activate_move_card(player_id, tile_id) {
+        let tile_idx = this.get_tile_idx(tile_id);
+        let player_pos = this.get_player_position(player_id);
+        let player_idx = this.get_player_idx(player_id)
         if (player_pos >= tile_idx) {
             this.player_wallets[player_idx] += 200;
         }
-        this.setPlayerPosition(player_id, tile_idx);
+        this.set_player_position(player_id, tile_idx);
         return 0;
     }
-    activateMoveNearestCard(player_id, group_name) {
-        let player_pos = this.getPlayerPosition(player_id);
-        let tile_positions = this.getIdsByGroup(group_name).map(property_id => {
-            return +(this.getTileIdx(property_id));
+    activate_move_nearest_card(player_id, group_name) {
+        let player_pos = this.get_player_position(player_id);
+        let tile_positions = this.get_ids_by_group(group_name).map(property_id => {
+            return +(this.get_tile_idx(property_id));
         }).sort((a, b) => a - b);
         let target_pos = tile_positions.find(pos => +player_pos < +pos);
         if (target_pos == undefined) {
             target_pos = tile_positions[0];
             //Looks like they will pass go.
         }
-        this.setPlayerPosition(player_id, target_pos);
+        this.set_player_position(player_id, target_pos);
         return 0;
     }
-    activateJailCard(player_id) {
-        this.sendPlayerToJail(player_id);
+    activate_jail_card(player_id) {
+        this.send_player_to_jail(player_id);
     }
     activatePropertyCharges(player_id) {
         let property_list = this.board.filter(property => property.owned_by == player_id)
@@ -347,7 +347,7 @@ class Game {
         return property_tax;
     }
     //activateAddFunds(player_id, )
-    activateCard(player_id, card_id) {
+    activate_card(player_id, card_id) {
         //actions
         //"move"
         //"movenearest"
@@ -360,17 +360,17 @@ class Game {
     }
     //This does everything. 
     //*rolls dice, move player, accounting, trigger random cards.
-    doMove(player_id, move_count) {
-        //let property_id = this.rollPlayerDie(player_id, die_count);
-        let property_idx = this.moveBy(player_id, move_count);
-        let pos = this.getPlayerPosition(player_id);
-        let player_idx = this.getPlayerIdx(player_id);
+    do_move(player_id, move_count) {
+        //let property_id = this.roll_player_die(player_id, die_count);
+        let property_idx = this.move_by(player_id, move_count);
+        let pos = this.get_player_position(player_id);
+        let player_idx = this.get_player_idx(player_id);
         if (pos < move_count) {
             this.player_wallets[player_idx] += 200;
         }
         let property_id = this.board[pos].id;
         if (property_id == 'gotojail') {
-            this.sendPlayerToJail(player_id)
+            this.send_player_to_jail(player_id)
             return;
         }
 

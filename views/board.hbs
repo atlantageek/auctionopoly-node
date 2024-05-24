@@ -83,9 +83,9 @@
                 }
             });
         };
-        function startGame() {
+        function start_game() {
             console.log("Button Click")
-            ws.send(JSON.stringify({msgType:'startGame'}))
+            ws.send(JSON.stringify({msgType:'start_game'}))
             $("#start_game_button").prop('disabled', true);
         }
         function getInput() {
@@ -262,7 +262,7 @@
             <div id="player2" class="player_details" ><div class="name">Player2</div><div class="account"></div></div>
             <div id="player3" class="player_details"><div class="name">Player3</div><div class="account"></div></div>
             <div id="player4" class="player_details"><div class="name">Player4</div><div class="account"></div></div>
-            <button id="start_game_button" onclick="startGame()">Start Game</button>
+            <button id="start_game_button" onclick="start_game()">Start Game</button>
             <button id="done_button" onclick="done()" disabled>Done</button>
         </div>
     </div>
