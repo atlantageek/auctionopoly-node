@@ -355,7 +355,7 @@ function rollDice() {
 function processPlayer(player) {
     let player_idx=game.get_player_idx(player);
     if (game.in_jail(player)){
-        
+
     }
     //If player is in jail then ask if they want to pay or roll
     //If not pay then roll for double {
@@ -399,7 +399,15 @@ function start_game() {
 //* NORMAL TURN:
 //** Do Roll
 //*  Move
-//* If project not owned then auction
+//* If project not owned then a {
+//*  Auction mode Start auction at mortgage price
+//*  (Wait for bid or 6 seconds) {
+//*     if six seconds and no bid leave property unowned
+//*     If bid then offer new amount
+//*     If six seconds then give property to winner and deduct funds
+//* }
+
+//*}
 
 
 //Start with first player and roll their dice
