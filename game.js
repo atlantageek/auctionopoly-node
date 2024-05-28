@@ -47,6 +47,7 @@ class Property extends Card {
     get owned_by() { return this._owned_by }
     set owned_by(owner) { this._owned_by = owner }
     get mortgage_value() { return this._price / 2 }
+    get ownable() {return this.group=='Special'}
 
 
     constructor(obj) {
@@ -113,14 +114,14 @@ class Game {
     board = [];
     reward = [];
     risk = [];
-    _game_started=false;
+    game_running=false;
     get open() {
         if (this.player_names.length >=4) return false;
         return true;
     }
     get game_started() {
         //if (this.open)return false;
-        return _game_started;
+        return game_running;
     }
     constructor() {
     }
@@ -145,11 +146,14 @@ class Game {
 
     }
     start_game() {
-        if (!this._game_started) {
-            this._game_started=true;
+        if (!this.game_running) {
+            this.game_running=true;
             return true;
         }
         return false;
+    }
+    get_property_by_position(pos) {
+        
     }
     next_turn() {
         this.turn++;

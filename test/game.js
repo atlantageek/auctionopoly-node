@@ -28,7 +28,7 @@ describe('#game()', function () {
       expect(r).to.equal(true);
       expect(game.player_list.length).to.equal(2)
       r=game.add_player('a','b');
-      expect(r).to.equal(falsef);
+      expect(r).to.equal(false);
       expect(game.player_list.length).to.equal(2)
 
     })
@@ -324,6 +324,11 @@ describe('#game()', function () {
       expect(game.activatePropertyCharges(9)).to.equal(200)
       game.add_house('parkplace');
       expect(game.activatePropertyCharges(9)).to.equal(200)
+    });
+    it('Check Property By Position',async() => {
+      var prop = game.get_tile_idx("freeparking");
+      expect(prop).to.equal(20)
+      expect(game.board[20].id).to.equal("freeparking")
     });
   })
 })

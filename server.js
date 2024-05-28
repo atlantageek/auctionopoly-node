@@ -2,6 +2,7 @@ const express = require('express');
 const redis = require("ioredis")
 require("dotenv").config();
 var Game = require('./game.js');
+var SM=require('./state_machine.js');
 const session = require('express-session');
 const redisStore = require('connect-redis')(session);
 const bodyParser = require('body-parser');
@@ -45,6 +46,8 @@ game.initialize().then((gobj) => {
     // property.add_house(); 
     // mort_property.mortgaged(true)
 })   
+console.log("GAME")
+
 const PORT = process.env.APP_PORT;
 const IN_PROD = process.env.NODE_ENV === 'production'
 const TWO_HOURS = 1000 * 60 * 60 * 2
@@ -97,37 +100,56 @@ const redirectHome = (req, res, next) => {
 }
   
 app.ws('/ws', function(ws, req) {
+    // ws.on('connection', function open() {
+    //     player_sockets.push('ws');
+    //     console.log("Connection Opened.")
+    // });
     ws.on('message', function(msg) {
+
+      
       let msgObj=JSON.parse(msg);
-      //register msg should have a user account, name associated with it.
-      if (msgObj.msgType=='register'){
-        if (!game.open) {
-            ws.send(JSON.stringify({msgType:'ERROR',errMsg:'Game is closed',kickout:true}));
-            return;
-        }
-        if (!msgObj.hasOwnProperty('name') || !msgObj.hasOwnProperty('user')) {
-            ws.send(JSON.stringify({msgType:'Error',errMsg:'Name and account are required'}));
-            return;
-        }
-        console.log('Adding Player' + req.session.email)
-        game.add_player(req.session.email,req.session.email);
+
+      console.log(req.session.email);
+
+      let response = SM.process_message(game,msgObj,req.session.email);
+      //If The response is register accepted then we need to add clients socket to the player list.
+      if (response.msgType == 'REGISTER_ACCEPT') {
         player_sockets.push(ws);
       }
-      if (msgObj.msgType=='start_game') {
-        console.log("try start game.")
-        if (game.start_game()) start_game();
-      } 
-      if (msgObj.msgType=='done') {
-        console.log("try start game.")
-        game.next_turn();
-        let player = game.get_current_player();
-        processPlayer(player);
-      } 
-      console.log('MSG' + msg);
-      setInterval(() => {
-        ws.send(JSON.stringify({gamestate:game, player:req.session.email, msgType:'update'}))
-      },1000)
-    });   
+      console.log("Sending Responses to " + player_sockets.length + " players.")
+      player_sockets.forEach(player_socket => {
+        player_socket.send(JSON.stringify(response))
+      });
+   
+      //register msg should have a user account, name associated with it.
+    //   if (msgObj.msgType=='register'){
+    //     if (!game.open) {
+    //         ws.send(JSON.stringify({msgType:'ERROR',errMsg:'Game is closed',kickout:true}));
+    //         return;
+    //     }
+    //     if (!msgObj.hasOwnProperty('name') || !msgObj.hasOwnProperty('user')) {
+    //         ws.send(JSON.stringify({msgType:'ERROR',errMsg:'Name and account are required'}));
+    //         return;
+    //     }
+    //     console.log('Adding Player' + req.session.email)
+    //     game.add_player(req.session.email,req.session.email);
+    //     player_sockets.push(ws);
+    //   }
+    //   if (msgObj.msgType=='start_game') {
+    //     console.log("try start game.")
+    //     if (game.start_game()) start_game();
+    //   } 
+    //   if (msgObj.msgType=='done') {
+    //     console.log("try start game.")
+    //     game.next_turn();
+    //     let player = game.get_current_player();
+    //     processPlayer(player);
+    //   } 
+    //   console.log('MSG' + msg);
+    //   setInterval(() => {
+    //     ws.send(JSON.stringify({gamestate:game, player:req.session.email, msgType:'update'}))
+    //   },1000)
+     });   
   });
   
 app.get('/', (req, res) => {
@@ -145,7 +167,7 @@ app.get('/home', redirectLogin, async (req, res) => {
         try {
             redisClient.hgetall(ACCOUNT_NAMESPACE + email, function (err, obj) {
 
-                console.log(obj)
+
                 //req.user = obj;
                 res.send(`
         <h1>Home</h1>
@@ -347,34 +369,30 @@ hbs.registerHelper("mortgageColor", function (id) {
     return "white"
 }); 
 
-function rollDice() {
-    let die1 = Math.floor(Math.random()*6)+1;
-    let die2 = Math.floor(Math.random()*6)+1; 
-    return die1+die2;
-}
-function processPlayer(player) {
-    let player_idx=game.get_player_idx(player);
-    if (game.in_jail(player)){
 
-    }
-    //If player is in jail then ask if they want to pay or roll
-    //If not pay then roll for double {
-        //If double then move
-    //}
-    //else If pay then allow move {
-    let move=rollDice();
-    //}
+// function processPlayer(player) {
+//     let player_idx=game.get_player_idx(player);
+//     if (game.in_jail(player)){
+
+//     }
+//     //If player is in jail then ask if they want to pay or roll
+//     //If not pay then roll for double {
+//         //If double then move
+//     //}
+//     //else If pay then allow move {
+//     let move=rollDice();
+//     //}
 
 
-    game.move_by(player,move);
-    // Get property player is on
-    //If property is available start bidding subfunction
-    //If property is owned... trigger rent pay
-    //If property is a function then do the function.
-    var jsonMsg = JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name})
-    player_sockets[player_idx].send(jsonMsg);
+//     game.move_by(player,move);
+//     // Get property player is on
+//     //If property is available start bidding subfunction
+//     //If property is owned... trigger rent pay
+//     //If property is a function then do the function.
+//     var jsonMsg = JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name})
+//     player_sockets[player_idx].send(jsonMsg);
  
-}
+// }
 function start_game() {
     console.log("Starting Game")
     let player = game.get_current_player();

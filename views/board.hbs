@@ -64,22 +64,37 @@
                 console.log("We are connected");
                 ws.send(JSON.stringify({'msgType':'register','name':'{{email}}', 'user':'{{email}}' }))
             });
+            resetBoard();
+
             ws.addEventListener('message', (msg) => {
                 let obj = JSON.parse(msg.data);
                 let gamestate=obj.gamestate;
                 let player=obj.player;
+                debugger;
                 populateBoard(gamestate.board, gamestate.player_list);
                 populatePlayers(gamestate.player_names, gamestate.player_wallets,gamestate.player_positions,gamestate.board);
+                populatePlayerStatus(gamestate.game_running,player,obj.msgType);
                 console.log('Player:' + player)
+               
                 if (obj.msgType =='update') {
                     console.log("Just an update");
                 }
-                if (obj.msgType == 'dosomething') {
-                    console.log("do something");
+                else if (obj.msgType == 'DOSOMETHING') {
+                    console.log("SETTING DIE");
+                    document.querySelector("#die1").innerText="Z"
+                     //document.querySelector("#die2").text=obj.roll.die2;
+                    //obj.roll.die1
+                    //obj.rol1.die2
+                    document.querySelector("#die1").innerText=obj.roll.die1
+                    document.querySelector("#die2").innerText=obj.roll.die2
                     player_ready=true;
                     getInput();
               
-                    $("#done_button").prop('disabled',false)
+                }
+                else if (obj.msgType == 'rollOrPay') {
+                    console.log("Roll or pay");
+                    roll_or_pay=true;
+            
                 }
             });
         };
@@ -88,14 +103,34 @@
             ws.send(JSON.stringify({msgType:'start_game'}))
             $("#start_game_button").prop('disabled', true);
         }
+        function rollOutOfJail() {
+            ws.send(JSON.stringify({msgType:'jail_roll'}))
+        }
+        function payOutOfJail() {
+            ws.send(JSON.stringify({msgType:'jail_pay'}))
+        }
         function getInput() {
-
+            $("#done_button").prop('disabled', false);
         }
         function done() {
             ws.send(JSON.stringify({msgType:'done'}));
             $("#done_button").prop('disabled', true);
         }
+        function populatePlayerStatus(game_running,player,mode) {
+            if (game_running) {
+                $("#start_game_button").prop('disabled',true);
+            
+                if (mode == 'dosomething' && '{{email}}' == player) {
+                    $("#done_button").prop('disabled',false)
+                }
+                else {
+                    $("#done_button").prop('disabled',true)
+                }
+            }
+   
+        }
         function populatePlayers(player_names,player_wallets, player_positions) {
+            console.log('Populate Players!')
             for (let i=0;i<player_names.length;i++) {
                 let player_id = '#player' + (i+1);
                 $(player_id+' .name').text(player_names[i]);
@@ -116,6 +151,19 @@
             }
             
         }
+         function resetBoard() {
+
+ 
+            for (let i=0;i<40;i++) { 
+                for (let j=0;j<4;j++) {
+                    let selector = '.' + tiles[i].id + " .player" + (j+1);
+                    $(selector).css("visibility", "hidden");
+                    
+                }
+            }
+     
+        }
+
         function populateBoard(board, player_list) {
             board.forEach(tile => {
                 let selector = '.' + tile._id;
@@ -262,6 +310,7 @@
             <div id="player2" class="player_details" ><div class="name">Player2</div><div class="account"></div></div>
             <div id="player3" class="player_details"><div class="name">Player3</div><div class="account"></div></div>
             <div id="player4" class="player_details"><div class="name">Player4</div><div class="account"></div></div>
+            <div ><span id="die1">C</span>/<span id="die2">D</span></div>
             <button id="start_game_button" onclick="start_game()">Start Game</button>
             <button id="done_button" onclick="done()" disabled>Done</button>
         </div>
