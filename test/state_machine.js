@@ -16,22 +16,32 @@ describe('#process_message()', function () {
     context('default object', () => {
       it('Initial Gameplay not yet started', async () => {  
         game.add_player("D","d")
-        var result = StateMachine.process_message(game,{msgType:'register'},'E');
+        game.add_player("E","e")
+        var result = StateMachine.process_message(game,{msgType:'register'},'C');
         expect(result.msgType).to.equal('ERROR')
       })
       it('Initial Gameplay not yet started', async () => {  
-
-        var result = StateMachine.process_message(game,{msgType:'register'},'E');
+        game.add_player("D","d")
+        var result = StateMachine.process_message(game,{msgType:'register'},'D');
         expect(result.msgType).to.equal('REGISTER_ACCEPT')
         expect(game.player_list.length).to.equal(4)
       })
       it('Start Game', async () => {  
 
-        var result = StateMachine.process_message(game,{msgType:'start_game'},'A');
+        var result = StateMachine.process_player_move(game,'A', {die1:3,die2:1,val:4,doubles:false});
         expect(result.msgType).to.equal('DOSOMETHING')
-        result = StateMachine.process_message(game,{msgType:'done'},'A');
-        expect(result.msgType).to.equal('DOSOMETHING')
-        expect(result.player).to.equal('B')
+        //expect(result.player).to.equal('B')
+        result = StateMachine.process_player_move(game,'A',{die1:3,die2:2,val:5,doubles:false});
+        expect(result.msgType).to.equal('AUCTION')
+        expect(result.property).to.equal('connecticutave')
+        expect(result.start_bid).to.equal(60)
       })
+      
+      // it('Available Property when Processling player', async () => {  
+      //   var result = StateMachine.process_player(game,'A',{die1:4,die2:1,val:5,doubles:false})
+      //   expect(result.msgType).to.equal('AUCTION');
+      //   expect(result.minimum_bid.to.equal(100))
+        
+      // })
     })
 });
