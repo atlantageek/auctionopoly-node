@@ -330,5 +330,15 @@ describe('#game()', function () {
       expect(prop).to.equal(20)
       expect(game.board[20].id).to.equal("freeparking")
     });
+    it('startAuction',async() => {
+      game.set_players("a","b","c","d");
+      var result = game.start_auction('gotojail')
+      expect(result).to.equal(false);
+      game.assign_ownership("a","mediterraneanave")
+      result = game.start_auction('mediterraneanave')
+      expect(result).to.equal(false);
+      result = game.start_auction('balticave')
+      expect(result).to.equal(true);
+    })
   })
 })

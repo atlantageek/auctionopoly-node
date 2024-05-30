@@ -36,6 +36,8 @@ class Property extends Card {
     _mortgaged = false;
     _probability = 2.1314;
 
+   
+
     get name() { return this._name; }
     get id() { return this._id }
     get position() { return this._posistion; }
@@ -64,7 +66,9 @@ class Property extends Card {
         this._group = obj.group;
         this._probability = obj.probability;
     }
-
+    get price() {
+        return this._price /2;
+    }
 
     add_house() {
         if (this._house_count >= 5) return false;
@@ -110,6 +114,9 @@ class Game {
     player_positions = [];
     player_wallets = [];
     player_in_jail = [];
+    _property_under_auction=null;
+    _property_bid=null;
+    _player_bidding=null;
     
     board = [];
     reward = [];
@@ -143,7 +150,38 @@ class Game {
         catch (e) {
             console.log(e);
         }
+    }
+    start_auction(property_id) {
+        
+        let property_idx = this.get_tile_idx(property_id)
+        var property = this.board[property_idx].owned_by ;
 
+        if (!property.ownable) return false;
+        console.log("---------------------------+++-")
+        console.log(property.owned_by)
+        if (property.owned_by != null) return false;
+        this._property_under_auction = this.get_property(property_id);
+        this._property_bid = this._property_under_auction.price
+
+    }
+    bid_auction(bid,player) {
+        if (this._property_under_auction == null) {return false;}
+        if (this._property_under_auction.owned_by != null) {return false;}
+        if (bid <= this._property_bid) {return false;}
+        this._player_bidding=player;
+        this._player_bid=bid;
+    }
+    close_auction() {
+        var property = this._property_under_auction;
+        
+        property.owned_by=this._player_bidding;
+        this.charge_player(this._player_bidding,this._property_bid);
+        this._property_under_auction=null;
+        this._property_bid=null;
+        this._player_bidding=null;
+
+
+        
     }
     start_game() {
         if (!this.game_running) {
@@ -300,6 +338,10 @@ class Game {
     get_wallet(player_id) {
         let player_idx = this.get_player_idx(player_id);
         return this.player_wallets[player_idx]
+    }
+    charge_player(player_id,amount) {
+        let player_idx = this.get_player_idx(player_id);
+        return this.player_wallets[player_idx]-=amount;
     }
     in_jail(player_id) {
         let player_idx = this.get_player_idx(player_id);
