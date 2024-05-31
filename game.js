@@ -32,7 +32,7 @@ class Property extends Card {
     _house_count = 0;
 
     _group = "";
-    _owned_by = -1;
+    _owned_by = null;
     _mortgaged = false;
     _probability = 2.1314;
 
@@ -153,26 +153,29 @@ class Game {
     }
     start_auction(property_id) {
         
-        let property_idx = this.get_tile_idx(property_id)
-        var property = this.board[property_idx].owned_by ;
-
+        let property = this.get_property(property_id)
         if (!property.ownable) return false;
-        console.log("---------------------------+++-")
-        console.log(property.owned_by)
         if (property.owned_by != null) return false;
         this._property_under_auction = this.get_property(property_id);
-        this._property_bid = this._property_under_auction.price
+        this._property_bid = this._property_under_auction._price/2
+        console.log('PROPERTY bid' + this._property_bid)
+        console.log('PROPERTY being auction' + JSON.stringify(this._property_under_auction))
+        return true;
 
     }
     bid_auction(bid,player) {
         if (this._property_under_auction == null) {return false;}
         if (this._property_under_auction.owned_by != null) {return false;}
+        if (this._player_bidding == player) return false;
         if (bid <= this._property_bid) {return false;}
         this._player_bidding=player;
-        this._player_bid=bid;
+        this._property_bid=bid;
+        return true
     }
     close_auction() {
+        if (this._property_under_auction == null || this._property_under_auction == undefined) return false;
         var property = this._property_under_auction;
+        this._property_under_auction=false;
         
         property.owned_by=this._player_bidding;
         this.charge_player(this._player_bidding,this._property_bid);
@@ -180,7 +183,7 @@ class Game {
         this._property_bid=null;
         this._player_bidding=null;
 
-
+        return true;
         
     }
     start_game() {

@@ -44,7 +44,7 @@ function process_player_move(game,player,roll=rollDice()) {
     console.log(property.id);
     console.log(property.owned_by)
     console.log("----------------------------------------------------")
-    if (property.ownable && property.owned_by == -1) {
+    if (property.ownable && (property.owned_by == -1 || property.owned_by == null)) {
         //Should we set a auction flag?
         //This message will set t
         var response = {msgType:'AUCTION',gamestate:game, player:player,roll:roll,start_bid:property.mortgage_value, property:property.id}

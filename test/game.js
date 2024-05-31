@@ -325,20 +325,48 @@ describe('#game()', function () {
       game.add_house('parkplace');
       expect(game.activatePropertyCharges(9)).to.equal(200)
     });
+  });
+  context('Auction property stuff.',()=> {
     it('Check Property By Position',async() => {
       var prop = game.get_tile_idx("freeparking");
       expect(prop).to.equal(20)
       expect(game.board[20].id).to.equal("freeparking")
     });
     it('startAuction',async() => {
+
       game.set_players("a","b","c","d");
-      var result = game.start_auction('gotojail')
+
+      var result = game.start_auction('gotojail');
+
       expect(result).to.equal(false);
+
       game.assign_ownership("a","mediterraneanave")
+
       result = game.start_auction('mediterraneanave')
       expect(result).to.equal(false);
       result = game.start_auction('balticave')
       expect(result).to.equal(true);
+      expect(30).to.equal(game._property_bid)
+      expect(null).to.equal(game._player_bidding)
+    })
+    it('cycleAuction',async() => {
+      game.set_players("a","b","c","d");
+      var b_wallet=game.get_wallet('b')
+      expect(1500).to.equal(b_wallet);
+      var result = game.start_auction('orientalave')
+      expect(50).to.equal(game._property_bid);
+      expect(false).to.equal(game.bid_auction(40,'a'))
+      expect(true).to.equal(game.bid_auction(60,'a'))
+      expect(false).to.equal(game.bid_auction(60,'a'))
+      expect(false).to.equal(game.bid_auction(70,'a'))
+      expect(false).to.equal(game.bid_auction(60,'b'))
+      expect(true).to.equal(game.bid_auction(70,'b'))
+      var result =game.close_auction();
+      expect(true).to.equal(result);
+      var property = game.get_property('orientalave');
+      expect('b').to.equal(property.owned_by)
+      b_wallet=game.get_wallet('b')
+      expect(1430).to.equal(b_wallet);
     })
   })
 })
