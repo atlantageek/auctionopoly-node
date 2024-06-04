@@ -106,7 +106,7 @@ app.ws('/ws', function(ws, req) {
     // });
     ws.on('message', function(msg) {
 
-      
+      console.log("WE JUST GOT A Letter. " + msg + " from: " + req.session.email)
       let msgObj=JSON.parse(msg);
 
       console.log(req.session.email);
@@ -389,7 +389,7 @@ hbs.registerHelper("mortgageColor", function (id) {
 //     //If property is available start bidding subfunction
 //     //If property is owned... trigger rent pay
 //     //If property is a function then do the function.
-//     var jsonMsg = JSON.stringify({msgType:'dosomething', gamestate:game,player:player.name})
+//     jsonMsg = "Do something message for player"
 //     player_sockets[player_idx].send(jsonMsg);
  
 // }

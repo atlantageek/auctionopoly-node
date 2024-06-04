@@ -346,15 +346,16 @@ describe('#game()', function () {
       expect(result).to.equal(false);
       result = game.start_auction('balticave')
       expect(result).to.equal(true);
-      expect(30).to.equal(game._property_bid)
-      expect(null).to.equal(game._player_bidding)
+      expect(30).to.equal(game.winning_bid)
+      expect(null).to.equal(game.winning_player)
     })
+
     it('cycleAuction',async() => {
       game.set_players("a","b","c","d");
       var b_wallet=game.get_wallet('b')
       expect(1500).to.equal(b_wallet);
       var result = game.start_auction('orientalave')
-      expect(50).to.equal(game._property_bid);
+      expect(50).to.equal(game.winning_bid);
       expect(false).to.equal(game.bid_auction(40,'a'))
       expect(true).to.equal(game.bid_auction(60,'a'))
       expect(false).to.equal(game.bid_auction(60,'a'))
@@ -368,5 +369,32 @@ describe('#game()', function () {
       b_wallet=game.get_wallet('b')
       expect(1430).to.equal(b_wallet);
     })
+  })
+
+  context('Test Player States.',()=> {
+    it('set player to invalid state',async() => {
+      game.set_players("a","b","c","d");
+      expect(true).to.equal(game.all_players_state('NOTREADY'));
+      expect(false).to.equal(game.set_player_state('a','FAKE'));
+      game.set_player_state
+    });
+    it('Check Player_ready',async() => {
+      game.set_players("a","b","c","d");
+      expect(true).to.equal(game.all_players_state('NOTREADY'));
+      game.set_player_state('a','WAITING')
+      expect(false).to.equal(game.all_players_state('NOTREADY'));
+      game.set_player_state('b','WAITING')
+      expect(false).to.equal(game.all_players_state('NOTREADY'));
+      game.set_player_state('c','WAITING')
+      expect('WAITING').to.equal(game.get_player_state('c'))
+      expect('WAITING').to.equal(game.get_player_state('b'))
+      expect('WAITING').to.equal(game.get_player_state('a'))
+      expect('NOTREADY').to.equal(game.get_player_state('d'))
+      expect(false).to.equal(game.all_players_state('NOTREADY'));
+      expect(false).to.equal(game.all_players_state('WAITING'));
+      game.set_player_state('d','WAITING')
+      expect(false).to.equal(game.all_players_state('NOTREADY'));
+      expect(true).to.equal(game.all_players_state('WAITING'));
+    });
   })
 })

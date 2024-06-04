@@ -55,30 +55,46 @@ function process_player_move(game,player,roll=rollDice()) {
     return response;
 }
 
-const process_message=(game,msgObj,email)=>{
+const process_message=(game,msgObj,player)=>{
     if (msgObj.msgType == 'register') {
-        console.log('REGISTER: ' + email);
+        console.log('REGISTER: ' + player);
         if (!game.open){
             
             return {msgType:'ERROR',errMsg:'Game is closed', kickout:true}
         }
     
-        game.add_player(email,email);
-        response={msgType:'REGISTER_ACCEPT',gamestate:game,player:email}
+        game.add_player(player,player);
+        response={msgType:'REGISTER_ACCEPT',gamestate:game,player:player}
     //player_sockets.push(ws);
         
     }
     else if (msgObj.msgType =='start_game') {
         console.log("try start game")
-        if (game.start_game()) {
-            let player=game.get_current_player();
-            response =process_player_move(game,player);
+        game.set_player_state(player,'WAITING')
+        if (game.all_players_state('WAITING')) {//
+            if (game.start_game()) {
+                let current_player=game.get_current_player();
+                game.set_player_state(current_player,'ROLLREADY')
+                response={msgType:'ROLLREADY',player:current_player,gamestate:game}
+                //response =process_player_move(game,player);
+            }
+            else {
+                return {msgType:'WAITING',gamestate:game}
+            }
         }
+    }
+    else if (msgObj.msgType == 'roll') {
+        let current_player = game.get_current_player()
+        process_player_move(game,player);
+        game.set_player_state(current_player,'DOSOMETHING')
+        response = {msgType:'UPDATE',gamestate:game}
     }
     else if (msgObj.msgType=='done') { // Player hit the done button and it goes to the next player.
         game.next_turn();
-        let player=game.get_current_player();
-        response=process_player_move(game,player);
+
+        let current_player=game.get_current_player();
+        game.set_player_state(current_player,'ROLLREADY')
+        response = {msgType:'UPDATE',gamestate:game}
     }
     return response;
 }

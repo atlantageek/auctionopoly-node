@@ -110,18 +110,20 @@ class Property extends Card {
 class Game {
     turn = 0;
     player_names=[];
-    player_list = [];
+    player_list = [];//Key Fields for players.
     player_positions = [];
     player_wallets = [];
     player_in_jail = [];
-    _property_under_auction=null;
-    _property_bid=null;
-    _player_bidding=null;
+    player_states=[];//NOTREADY,WAITING,ROLLREADY,DOSOMETHING
+    _property_id_under_auction=null;
+    _winning_bid=null;
+    _winning_player=null;
     
     board = [];
     reward = [];
     risk = [];
     game_running=false;
+    current_player=null;
     get open() {
         if (this.player_names.length >4) return false;
         return true;
@@ -129,6 +131,12 @@ class Game {
     get game_started() {
         //if (this.open)return false;
         return game_running;
+    }
+    get winning_bid() {
+        return this._winning_bid;
+    }
+    get winning_player() {
+        return this._winning_player
     }
     constructor() {
     }
@@ -151,37 +159,72 @@ class Game {
             console.log(e);
         }
     }
+    //STARTS at NOTREADY. Then it goes to WAITING which becomes the default state.
+    //NOTREADY -- PLAYER has not his the ready button to say they want to start the game
+    //WAITING-- Player Waiting for either waiting for everyone to start the game or waiting for their turn 
+    //ROLLREADY - Player's turn and they have not rolled yet.
+    //DOSOMETHING- Player has rolled but now they can do property maintenance.  When they are done they say they are DONE. player gets set to WAITING
+    set_player_state(player,state) {//NOTREADY,WAITING,ROLLREADY,DOSOMETHING
+        console.log('Player: ' + player + ' State:' + state)
+        if (!['NOTREADY','WAITING','ROLLREADY','DOSOMETHING'].includes(state)) {
+            console.log("Should fail here.")
+            return false;
+        }
+        var idx=this.player_list.findIndex(p=>p==player);
+        if (idx == -1) return false;
+        for(var i=0;i<this.player_list.length;i++) {
+            if (idx==i) {
+                this.player_states[i]=state;
+            }
+            else {
+                if (this.player_states[i]!='NOTREADY') this.player_states[i]='WAITING'
+            }
+        }
+        return true
+    }
+    get_player_state(player) {
+        var idx=this.player_list.findIndex(p=>p==player);
+        return this.player_states[idx];
+    }
+    all_players_state(state) {
+        for(var i=0;i<this.player_list.length;i++) {
+            if (state != this.player_states[i]) {
+                return false
+            }
+        }
+        return true;
+    }
     start_auction(property_id) {
         
         let property = this.get_property(property_id)
         if (!property.ownable) return false;
         if (property.owned_by != null) return false;
-        this._property_under_auction = this.get_property(property_id);
-        this._property_bid = this._property_under_auction._price/2
-        console.log('PROPERTY bid' + this._property_bid)
-        console.log('PROPERTY being auction' + JSON.stringify(this._property_under_auction))
+        this._property_id_under_auction = property_id; //this.get_property(property_id);
+        this._winning_bid = property._price/2
+        console.log('PROPERTY bid' + this.winning_bid)
+        console.log('PROPERTY being auction' + JSON.stringify(this._property_id_under_auction))
         return true;
 
     }
     bid_auction(bid,player) {
-        if (this._property_under_auction == null) {return false;}
-        if (this._property_under_auction.owned_by != null) {return false;}
-        if (this._player_bidding == player) return false;
-        if (bid <= this._property_bid) {return false;}
-        this._player_bidding=player;
-        this._property_bid=bid;
+        if (this._property_id_under_auction == null) {return false;}
+        if (this._property_id_under_auction.owned_by != null) {return false;}
+        if (this.winning_player == player) return false;
+        if (bid <= this.winning_bid) {return false;}
+        this._winning_player=player;
+        this._winning_bid=bid;
         return true
     }
     close_auction() {
-        if (this._property_under_auction == null || this._property_under_auction == undefined) return false;
-        var property = this._property_under_auction;
-        this._property_under_auction=false;
+        if (this._property_id_under_auction == null || this._property_id_under_auction == undefined) return false;
+        var property = this.get_property(this._property_id_under_auction);
+        this._property_id_under_auction=null;
         
-        property.owned_by=this._player_bidding;
-        this.charge_player(this._player_bidding,this._property_bid);
-        this._property_under_auction=null;
-        this._property_bid=null;
-        this._player_bidding=null;
+        property.owned_by=this.winning_player;
+        this.charge_winner(this.winning_player,this.winning_bid);
+        this._property_id_under_auction=null;
+        this._winning_bid=null;
+        this._winning_player=null;
 
         return true;
         
@@ -189,6 +232,7 @@ class Game {
     start_game() {
         if (!this.game_running) {
             this.game_running=true;
+            this.current_player = this.player_list[0];
             return true;
         }
         return false;
@@ -198,8 +242,11 @@ class Game {
     }
     next_turn() {
         this.turn++;
+        let player_idx = this.turn % this.player_list.length;
+        this.current_player = this.player_list[player_idx];
     }
     get_current_player() {
+        console.log("TURN: " + this.turn)
         let player_idx = this.turn % this.player_list.length;
         return player_list[player_idx];
     }
@@ -212,6 +259,7 @@ class Game {
             this.player_wallets.push(1500);
             this.player_in_jail.push(false);
             this.player_names.push(name);
+            this.player_states.push('NOTREADY')
             return true;
         }
     }
@@ -221,6 +269,7 @@ class Game {
         this.player_wallets = [1500, 1500, 1500, 1500];
         this.player_in_jail = [false, false, false, false]
         this.player_names=['Bob1','Eve2','William3','Jenny4']
+        this.player_states=['NOTREADY','NOTREADY','NOTREADY','NOTREADY']
         //randomize players;
         //this.randomize_players();
     }
@@ -342,7 +391,7 @@ class Game {
         let player_idx = this.get_player_idx(player_id);
         return this.player_wallets[player_idx]
     }
-    charge_player(player_id,amount) {
+    charge_winner(player_id,amount) {
         let player_idx = this.get_player_idx(player_id);
         return this.player_wallets[player_idx]-=amount;
     }
