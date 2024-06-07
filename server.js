@@ -115,6 +115,7 @@ app.ws('/ws', function(ws, req) {
       //If The response is register accepted then we need to add clients socket to the player list.
       if (response.msgType == 'REGISTER_ACCEPT') {
         player_sockets.push(ws);
+        console.log("Socket push.")
       }
       console.log("Sending Responses to " + player_sockets.length + " players.")
       player_sockets.forEach(player_socket => {

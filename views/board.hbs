@@ -72,7 +72,6 @@
                 let player_id='{{email}}';
                 let player_idx=gamestate.player_list.findIndex(p=>p==player_id);
                 let player_state=gamestate.player_states[player_idx];
-                debugger;
                 console.log("PLAYER STATE: + " + player_state)
                 populateBoard(gamestate.board, gamestate.player_list);
                 populatePlayers(gamestate.player_names, gamestate.player_wallets,gamestate.player_positions,gamestate.board);
@@ -106,7 +105,6 @@
         }
         function populatePlayerStatus(mode) {
             console.log("USING STATE: " + mode)
-            debugger;
             switch(mode){
                 case 'NOTREADY':
                     $("#start_game_button").prop('disabled',false);
