@@ -75,7 +75,10 @@
                 console.log("PLAYER STATE: + " + player_state)
                 populateBoard(gamestate.board, gamestate.player_list);
                 populatePlayers(gamestate.player_names, gamestate.player_wallets,gamestate.player_positions,gamestate.board);
+                
                 populatePlayerStatus(player_state);
+
+               populateDice(obj)
                
                 if (obj.msgType =='update') {
                     console.log("Just an update");
@@ -103,6 +106,17 @@
             ws.send(JSON.stringify({msgType:'done'}));
             $("#done_button").prop('disabled', true);
         }
+        function done() {
+            ws.send(JSON.stringify({msgType:'bid'}));
+        }
+        function populateDice(game) {
+            if (game.hasOwnProperty('roll')) {
+                var dice = game['roll']
+                console.log($('#die1'));
+                $('#die1').text(dice['die1']);
+                $('#die2').text(dice['die2'])
+            }
+        }
         function populatePlayerStatus(mode) {
             console.log("USING STATE: " + mode)
             switch(mode){
@@ -110,22 +124,32 @@
                     $("#start_game_button").prop('disabled',false);
                     $("#roll_button").prop('disabled',true);
                     $("#done_button").prop('disabled',true);
+                    $("#bidding_button").prop('disabled',true);
                     break;
                 case 'WAITING':
                     $("#start_game_button").prop('disabled',true);
                     $("#roll_button").prop('disabled',true);
                     $("#done_button").prop('disabled',true);
+                    $("#bidding_button").prop('disabled',true);
                     break;
                 case 'ROLLREADY':
                     $("#start_game_button").prop('disabled',true);
                     $("#roll_button").prop('disabled',false);
                     $("#done_button").prop('disabled',true);
+                    $("#bidding_button").prop('disabled',true);
                     break;
                 case 'DOSOMETHING':
                     $("#start_game_button").prop('disabled',true);
                     $("#roll_button").prop('disabled',true);
                     $("#done_button").prop('disabled',false);
+                    $("#bidding_button").prop('disabled',true);
                     break;
+                case 'AUCTION': 
+                    $("#start_game_button").prop('disabled',true);
+                    $("#roll_button").prop('disabled',true);
+                    $("#done_button").prop('disabled',true);
+                    $("#bidding_button").prop('disabled',false);
+
             }
         }
         function populatePlayers(player_names,player_wallets, player_positions) {
@@ -313,6 +337,7 @@
             <button id="start_game_button" onclick="start_game()">Ready</button>
             <button id="roll_button" onclick="roll()" disabled>Roll</button>
             <button id="done_button" onclick="done()" disabled>Done</button>
+            <button id="bidding_button" onclick="bid()" disabled>Bid</button>
         </div>
     </div>
 </body>

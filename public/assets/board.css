@@ -51,6 +51,7 @@ body {
   display:flex;
   flex-direction:column;
   width:400px;
+  background-color:white;
 }
 .player_details {
   display:flex;
@@ -65,4 +66,17 @@ body {
 }
 .player_details .account {
   padding:10px;
+}
+div#player1 .name {
+  color:lightgreen;
+
+}
+div#player2 .name {
+  color:lightblue;
+}
+div#player3 .name {
+  color:pink;
+}
+div#player4 .name {
+  color:yellow;
 }

@@ -27,8 +27,8 @@ player_sockets=[];
 //setup Game Object
 let game = new Game();
 game.initialize().then((gobj) => {
-    // gobj.set_players(1, 2, 3, 4) 
-    // gobj.assign_ownership(2, 'boardwalk');
+    //gobj.set_players(1, 2, 3, 4) 
+    //gobj.assign_ownership(2, 'boardwalk');
     // gobj.assign_ownership(2, 'parkplace');
     // gobj.assign_ownership(3, 'mediterraneanave');
 
