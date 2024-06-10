@@ -82,11 +82,11 @@
                      
                      current_bid=gamestate.current_bid || 0;
                      next_bid=gamestate.next_bid;
-                     populatePlayerStatus('AUCTION',current_bid,next_bid);
+                     populatePlayerStatus('AUCTION',gamestate);
                      console.log('BID SETUP: ' + this.current_bid + " , " + this.next_bid);
                 }
                 else  {
-                    populatePlayerStatus(player_state);
+                    populatePlayerStatus(player_state,gamestate);
                     populateDice(obj)
                 }
                
@@ -124,8 +124,11 @@
                 $('#die2').text(dice['die2'])
             }
         }
-        function populatePlayerStatus(mode,current_bid,next_bid) {
+        function populatePlayerStatus(mode,gamestate) {
             console.log("USING STATE: " + mode)
+                    $("#current_bid").text('');
+                    $("#next_bid").text('');
+                    $("#winning_player").text('')
             switch(mode){
                 case 'NOTREADY':
                     $("#start_game_button").prop('disabled',false);
@@ -156,8 +159,9 @@
                     $("#roll_button").prop('disabled',true);
                     $("#done_button").prop('disabled',true);
                     $("#bidding_button").prop('disabled',false);
-                    $("#current_bid").text(current_bid);
-                    $("#next_bid").text(next_bid);
+                    $("#current_bid").text(gamestate.current_bid);
+                    $("#next_bid").text(gamestate.next_bid);
+                    $("#winning_player").text(gamestate.winning_player)
                     console.log("FOR AUCTION, populating")
 
             }
@@ -349,6 +353,7 @@
             <button id="roll_button" onclick="roll()" disabled>Roll</button>
             <button id="done_button" onclick="done()" disabled>Done</button>
             <button id="bidding_button" onclick="bid()" disabled>Bid [<span id="next_bid">]</span></button>
+            <span id="winning_player"></span>
         </div>
     </div>
 </body>
