@@ -49,9 +49,11 @@ function process_player_move(game,player,roll=rollDice()) {
         
         console.log("This property should be going up for auction.")
         //Set all players to BIDDING
-
-        //var response = {msgType:'AUCTION',gamestate:game, player:player,roll:roll,start_bid:property.mortgage_value, property:property.id, winning_player:null}
-        //return response;
+        game.start_auction(property.id);
+        var response = {msgType:'AUCTION',gamestate:game, player:player,roll:roll,current_bid:0,next_bid:property.mortgage_value, property:property.id, winning_player:null}
+        
+        console.log("AUCTION! 2")
+        return response;
 
     }
     var response={msgType:'DOSOMETHING',gamestate:game,player:player,roll:roll}
@@ -96,7 +98,19 @@ const process_message=(game,msgObj,player)=>{
             response=process_player_move(game,player);
             game.set_player_state(player,response.msgType)//If a double then ROLLREADY again otherwise DOSOMETHING
             break;
-        
+
+        case 'bid':
+            if (!game.auction_active()) throw new Error('No bidding on inactive auction.')
+            game.current_bid=game.next_bid;
+            game.next_bid=game.next_bid+10;
+            game.winning_player=msgObj.bidder;
+            var response = {msgType:'AUCTION',gamestate:game, player:player}
+            //let bidder =msgObj.bidder;
+            //Set Current Bid=next_bid
+            //Add 10 to current bid for next bid
+            //set current_bidder=msgObj.bidder
+            break;
+
         case 'done':
             game.next_turn();
             let next_player=game.get_current_player()
@@ -107,7 +121,7 @@ const process_message=(game,msgObj,player)=>{
 
         
     }
-    
+    console.log("IS this an auction:" + response.msgType)
     return response;
 }
 exports.process_message=process_message;

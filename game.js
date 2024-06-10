@@ -116,8 +116,8 @@ class Game {
     player_in_jail = [];
     player_states=[];//NOTREADY,WAITING,ROLLREADY,DOSOMETHING
     _property_id_under_auction=null;
-    _winning_bid=null;
-    _winning_player=null;
+    winning_bid=null;
+    winning_player=null;
     
     board = [];
     reward = [];
@@ -133,10 +133,10 @@ class Game {
         return game_running;
     }
     get winning_bid() {
-        return this._winning_bid;
+        return this.winning_bid;
     }
     get winning_player() {
-        return this._winning_player
+        return this.winning_player
     }
     constructor() {
     }
@@ -165,8 +165,8 @@ class Game {
     //ROLLREADY - Player's turn and they have not rolled yet.
     //DOSOMETHING- Player has rolled but now they can do property maintenance.  When they are done they say they are DONE. player gets set to WAITING
     set_player_state(player,state) {//NOTREADY,WAITING,ROLLREADY,DOSOMETHING
-        console.log('Player: ' + player + ' State:' + state)
-        if (!['NOTREADY','WAITING','ROLLREADY','DOSOMETHING'].includes(state)) {
+        console.log('Setting: Player: ' + player + ' State:' + state)
+        if (!['NOTREADY','WAITING','ROLLREADY','DOSOMETHING','AUCTION'].includes(state)) {
             console.log("Should fail here.")
             return false;
         }
@@ -194,13 +194,25 @@ class Game {
         }
         return true;
     }
+    set_all_players_state(state) {
+        for(var i=0;i<this.player_list.length;i++) {
+            this.set_player_state(this.player_list[i],state)
+            
+        }
+        return true;
+    }
+    auction_active() {
+        if (this._property_id_under_auction != null) return true;
+        else return false;
+    }
     start_auction(property_id) {
         
         let property = this.get_property(property_id)
         if (!property.ownable) return false;
         if (property.owned_by != null) return false;
         this._property_id_under_auction = property_id; //this.get_property(property_id);
-        this._winning_bid = property._price/2
+        this.winning_bid = property._price/2
+        this.next_bid=this.winning_bid+10;
         console.log('PROPERTY bid' + this.winning_bid)
         console.log('PROPERTY being auction' + JSON.stringify(this._property_id_under_auction))
         return true;
@@ -211,8 +223,9 @@ class Game {
         if (this._property_id_under_auction.owned_by != null) {return false;}
         if (this.winning_player == player) return false;
         if (bid <= this.winning_bid) {return false;}
-        this._winning_player=player;
-        this._winning_bid=bid;
+        this.winning_player=player;
+        this.winning_bid=bid;
+        this.next_bid=this.winning_bid+10;
         return true
     }
     close_auction() {
@@ -223,8 +236,9 @@ class Game {
         property.owned_by=this.winning_player;
         this.charge_winner(this.winning_player,this.winning_bid);
         this._property_id_under_auction=null;
-        this._winning_bid=null;
-        this._winning_player=null;
+        this.winning_bid=null;
+        this.winning_player=null;
+        this.next_bid=0
 
         return true;
         

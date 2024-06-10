@@ -34,7 +34,7 @@ describe('#process_message()', function () {
         result = StateMachine.process_player_move(game,'A',{die1:3,die2:2,val:5,doubles:false});
         expect(result.msgType).to.equal('AUCTION')
         expect(result.property).to.equal('connecticutave')
-        expect(result.start_bid).to.equal(60)
+        expect(result.next_bid).to.equal(60)
       })
       
       // it('Available Property when Processling player', async () => {  

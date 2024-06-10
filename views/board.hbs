@@ -53,6 +53,8 @@
       {"id": "boardwalk"}
     ]
     let ws=null;
+    let current_bid=0;
+    let next_bid=0;
         function init() {
             console.log("LOADED")
             $(".balticave .secondhouse").css("visibility", "visible");
@@ -71,18 +73,23 @@
                 let gamestate=obj.gamestate;
                 let player_id='{{email}}';
                 let player_idx=gamestate.player_list.findIndex(p=>p==player_id);
+                
                 let player_state=gamestate.player_states[player_idx];
-                console.log("PLAYER STATE: + " + player_state)
+                console.log("PLAYER STATE: + " + player_state + " Msg Type: " + obj.msgType)
                 populateBoard(gamestate.board, gamestate.player_list);
                 populatePlayers(gamestate.player_names, gamestate.player_wallets,gamestate.player_positions,gamestate.board);
-                
-                populatePlayerStatus(player_state);
-
-               populateDice(obj)
-               
-                if (obj.msgType =='update') {
-                    console.log("Just an update");
+                if (obj.msgType =='AUCTION'){
+                     
+                     current_bid=gamestate.current_bid || 0;
+                     next_bid=gamestate.next_bid;
+                     populatePlayerStatus('AUCTION',current_bid,next_bid);
+                     console.log('BID SETUP: ' + this.current_bid + " , " + this.next_bid);
                 }
+                else  {
+                    populatePlayerStatus(player_state);
+                    populateDice(obj)
+                }
+               
             });
         };
         function start_game() {
@@ -106,8 +113,8 @@
             ws.send(JSON.stringify({msgType:'done'}));
             $("#done_button").prop('disabled', true);
         }
-        function done() {
-            ws.send(JSON.stringify({msgType:'bid'}));
+        function bid() {
+            ws.send(JSON.stringify({msgType:'bid', bidder: '{{email}}'}));
         }
         function populateDice(game) {
             if (game.hasOwnProperty('roll')) {
@@ -117,7 +124,7 @@
                 $('#die2').text(dice['die2'])
             }
         }
-        function populatePlayerStatus(mode) {
+        function populatePlayerStatus(mode,current_bid,next_bid) {
             console.log("USING STATE: " + mode)
             switch(mode){
                 case 'NOTREADY':
@@ -149,6 +156,9 @@
                     $("#roll_button").prop('disabled',true);
                     $("#done_button").prop('disabled',true);
                     $("#bidding_button").prop('disabled',false);
+                    $("#current_bid").text(current_bid);
+                    $("#next_bid").text(next_bid);
+                    console.log("FOR AUCTION, populating")
 
             }
         }
@@ -216,10 +226,11 @@
 
                 }
                 if ( tile['group'] != 'Special')
-                    if(tile._owned_by != -1) {
+                    if(tile._owned_by != -1 && tile._owned_by != null) {
 
                         let player_idx = player_list.findIndex(p => p == tile._owned_by)
                         if (player_idx == -1) {
+                            debugger;
                             console.log("THIS Should not happen")
                         }
                         $(selector + ' .owner').css({ fill: player_colors[player_idx] })
@@ -337,7 +348,7 @@
             <button id="start_game_button" onclick="start_game()">Ready</button>
             <button id="roll_button" onclick="roll()" disabled>Roll</button>
             <button id="done_button" onclick="done()" disabled>Done</button>
-            <button id="bidding_button" onclick="bid()" disabled>Bid</button>
+            <button id="bidding_button" onclick="bid()" disabled>Bid [<span id="next_bid">]</span></button>
         </div>
     </div>
 </body>

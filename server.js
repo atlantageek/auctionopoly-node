@@ -22,7 +22,8 @@ const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
  
 app.use(cors()); 
-player_sockets=[];
+
+
    
 //setup Game Object
 let game = new Game();
@@ -100,56 +101,29 @@ const redirectHome = (req, res, next) => {
 }
   
 app.ws('/ws', function(ws, req) {
-    // ws.on('connection', function open() {
-    //     player_sockets.push('ws');
-    //     console.log("Connection Opened.")
-    // });
     ws.on('message', function(msg) {
-
+       expressWs.getWss().clients.forEach(e=> {
+        if (e==ws) {console.log("+")}
+        console.log('*');
+       })
       console.log("WE JUST GOT A Letter. " + msg + " from: " + req.session.email)
       let msgObj=JSON.parse(msg);
 
       console.log(req.session.email);
+      let response = null;
 
-      let response = SM.process_message(game,msgObj,req.session.email);
-      //If The response is register accepted then we need to add clients socket to the player list.
-      if (response.msgType == 'REGISTER_ACCEPT') {
-        player_sockets.push(ws);
-        console.log("Socket push.")
-      }
-      console.log("Sending Responses to " + player_sockets.length + " players.")
-      player_sockets.forEach(player_socket => {
+        response = SM.process_message(game,msgObj,req.session.email);
+        //If The response is register accepted then we need to add clients socket to the player list.
+        if (response.msgType == 'REGISTER_ACCEPT') {
+            console.log("Socket push.")
+        }
+    
+    console.log("Sending Responses to " + expressWs.getWss().clients.size + " players." + msgObj.msgType)
+    expressWs.getWss().clients.forEach(player_socket => {
         player_socket.send(JSON.stringify(response))
       });
    
-      //register msg should have a user account, name associated with it.
-    //   if (msgObj.msgType=='register'){
-    //     if (!game.open) {
-    //         ws.send(JSON.stringify({msgType:'ERROR',errMsg:'Game is closed',kickout:true}));
-    //         return;
-    //     }
-    //     if (!msgObj.hasOwnProperty('name') || !msgObj.hasOwnProperty('user')) {
-    //         ws.send(JSON.stringify({msgType:'ERROR',errMsg:'Name and account are required'}));
-    //         return;
-    //     }
-    //     console.log('Adding Player' + req.session.email)
-    //     game.add_player(req.session.email,req.session.email);
-    //     player_sockets.push(ws);
-    //   }
-    //   if (msgObj.msgType=='start_game') {
-    //     console.log("try start game.")
-    //     if (game.start_game()) start_game();
-    //   } 
-    //   if (msgObj.msgType=='done') {
-    //     console.log("try start game.")
-    //     game.next_turn();
-    //     let player = game.get_current_player();
-    //     processPlayer(player);
-    //   } 
-    //   console.log('MSG' + msg);
-    //   setInterval(() => {
-    //     ws.send(JSON.stringify({gamestate:game, player:req.session.email, msgType:'update'}))
-    //   },1000)
+
      });   
   });
   
