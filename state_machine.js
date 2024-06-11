@@ -25,7 +25,11 @@
 //*     If six seconds then give property to winner and deduct funds
 //* }
 
+const { reset } = require("nodemon");
+
 //*}
+auction_interval=null;
+auction_countdown=0;
 function rollDice() {
     let die1 = Math.floor(Math.random()*6)+1;
     let die2 = Math.floor(Math.random()*6)+1; 
@@ -52,7 +56,7 @@ function process_player_move(game,player,roll=rollDice()) {
         game.start_auction(property.id);
         var response = {msgType:'AUCTION',gamestate:game, player:player,roll:roll,current_bid:0,next_bid:property.mortgage_value, property:property.id, winning_player:null}
         
-        console.log("AUCTION! 2")
+        resetInterval(game);
         return response;
 
     }
@@ -101,14 +105,13 @@ const process_message=(game,msgObj,player)=>{
 
         case 'bid':
             if (!game.auction_active()) throw new Error('No bidding on inactive auction.')
-            game.current_bid=game.next_bid;
-            game.next_bid=game.next_bid+10;
-            game.winning_player=msgObj.bidder;
+            var bid = game.next_bid;
+            game.bid_auction(bid,msgObj.bidder)
             var response = {msgType:'AUCTION',gamestate:game, player:player}
+            //NO RESPONSE being sent here... very annoying
+            
             //let bidder =msgObj.bidder;
-            //Set Current Bid=next_bid
-            //Add 10 to current bid for next bid
-            //set current_bidder=msgObj.bidder
+            resetInterval(game);
             break;
 
         case 'done':
@@ -123,6 +126,23 @@ const process_message=(game,msgObj,player)=>{
     }
     console.log("IS this an auction:" + response.msgType)
     return response;
+}
+
+function resetInterval(game) {
+    if (auction_interval!=null)clearInterval(auction_interval)
+    auction_countdown=6;
+    auction_interval=setInterval(()=>{
+        if (auction_countdown <=0){
+            if (auction_interval!=null)clearInterval(auction_interval)
+            auction_interval=null;
+            game.close_auction();
+            game.set_player_state(player,'DOSIMETHING')
+        }
+        else {
+            auction_countdown -=1;
+            console.log(auction_countdown);
+        }
+    },1000);
 }
 exports.process_message=process_message;
 exports.process_player_move=process_player_move;

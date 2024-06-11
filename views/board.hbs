@@ -55,9 +55,11 @@
     let ws=null;
     let current_bid=0;
     let next_bid=0;
+    let auction_countdown=0;
+    let auction_interval=null;
         function init() {
             console.log("LOADED")
-            $(".balticave .secondhouse").css("visibility", "visible");
+            $(".balticave .secondhouse").css("vFisibility", "visible");
             $("#iam").text('{{email}}')
             const socketProtocol = (window.location.protocol === 'https:' ? 'wss:' : 'ws:')
             const echoSocketUrl = socketProtocol + '//' + window.location.hostname + ':' + window.location.port + '/ws'
@@ -79,7 +81,19 @@
                 populateBoard(gamestate.board, gamestate.player_list);
                 populatePlayers(gamestate.player_names, gamestate.player_wallets,gamestate.player_positions,gamestate.board);
                 if (obj.msgType =='AUCTION'){
-                     
+                    auction_countdown=6;
+                    if (auction_interval!=null)clearInterval(auction_interval)
+                    auction_interval=setInterval(()=>{
+                        if (auction_countdown <=0){
+                            if (auction_interval!=null)clearInterval(auction_interval)
+                            auction_interval=null;
+                        }
+                        else {
+                            auction_countdown -=1;
+                            $("#bidding_timer").text(''+auction_countdown + " seconds",true);
+                        }
+                    },1000);
+                     $("#bidding_button").prop('disabled',true);
                      current_bid=gamestate.current_bid || 0;
                      next_bid=gamestate.next_bid;
                      populatePlayerStatus('AUCTION',gamestate);
@@ -352,7 +366,9 @@
             <button id="start_game_button" onclick="start_game()">Ready</button>
             <button id="roll_button" onclick="roll()" disabled>Roll</button>
             <button id="done_button" onclick="done()" disabled>Done</button>
-            <button id="bidding_button" onclick="bid()" disabled>Bid [<span id="next_bid">]</span></button>
+            <button id="bidding_button" onclick="bid()" disabled>Bid [<span id="next_bid"></span>]</button>
+
+            <span id="bidding_timer"></span> Seconds
             <span id="winning_player"></span>
         </div>
     </div>
