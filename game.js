@@ -264,7 +264,7 @@ class Game {
         this.winning_bid=null;
         this.winning_player=null;
         this.next_bid=0
-        this.set_player_state(this.get_current_player(),'DOSIMETHING')
+        this.set_player_state(this.get_current_player(),'DOSOMETHING')
         return true;
         
     }
