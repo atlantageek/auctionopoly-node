@@ -2,29 +2,29 @@ const express = require('express');
 const redis = require("ioredis")
 require("dotenv").config();
 var Game = require('./game.js');
-var SM=require('./state_machine.js');
+var SM = require('./state_machine.js');
 const session = require('express-session');
 const redisStore = require('connect-redis')(session);
 const bodyParser = require('body-parser');
 const path = require('path')
 const hbs = require('hbs')
-const fs = require('fs'); 
+const fs = require('fs');
 const fsPromises = require('fs').promises;
 
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
 const ACCOUNT_NAMESPACE = 'account:'
- 
+
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 const app = express();
 const expressWs = require('express-ws')(app)
 const publicPath = path.join(__dirname, 'public');
 const cors = require("cors");
 const { weightSrvRecords } = require('ioredis/built/cluster/util.js');
- 
-app.use(cors()); 
+
+app.use(cors());
 
 
-   
+
 //setup Game Object
 let game = new Game();
 game.initialize().then((gobj) => {
@@ -46,7 +46,7 @@ game.initialize().then((gobj) => {
     // property2.add_house(); 
     // property.add_house(); 
     // mort_property.mortgaged(true)
-})   
+})
 console.log("GAME")
 
 const PORT = process.env.APP_PORT;
@@ -60,7 +60,7 @@ const redisClient = new redis();
 
 
 const sessionStore = new redisStore({ client: redisClient });
- 
+
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -90,8 +90,8 @@ const redirectLogin = (req, res, next) => {
     } else {
         next()
     }
-} 
-   
+}
+
 const redirectHome = (req, res, next) => {
     if (req.session.email) {
         res.redirect('/home')
@@ -99,42 +99,50 @@ const redirectHome = (req, res, next) => {
         next()
     }
 }
-  
-app.ws('/ws', function(ws, req) {
-    ws.on('message', function(msg) {
-       expressWs.getWss().clients.forEach(e=> {
-        if (e==ws) {console.log("+")}
-        console.log('*');
-       })
-      console.log("WE JUST GOT A Letter. " + msg + " from: " + req.session.email)
-      let msgObj=JSON.parse(msg);
+function broadcastWs(msg) {
+    expressWs.getWss().clients.forEach(player_socket => {
+        player_socket.send(JSON.stringify(msg))
+    });
+}
 
-      console.log(req.session.email);
-      let response = null;
+app.ws('/ws', function (ws, req) {
+    ws.on('message', function (msg) {
+        expressWs.getWss().clients.forEach(e => {
+            if (e == ws) { console.log("+") }
+            console.log('*');
+        })
+        console.log("WE JUST GOT A Letter. " + msg + " from: " + req.session.email)
+        let msgObj = JSON.parse(msg);
 
-        response = SM.process_message(game,msgObj,req.session.email);
+        console.log(req.session.email);
+        let response = null;
+
+        response = SM.process_message(game, msgObj, req.session.email);
+        
+        
         //If The response is register accepted then we need to add clients socket to the player list.
         if (response.msgType == 'REGISTER_ACCEPT') {
             console.log("Socket push.")
         }
-    
-    console.log("Sending Responses to " + expressWs.getWss().clients.size + " players." + msgObj.msgType)
-    expressWs.getWss().clients.forEach(player_socket => {
-        player_socket.send(JSON.stringify(response))
-      });
-   
 
-     });   
-  });
-  
+        console.log("Sending Responses to " + expressWs.getWss().clients.size + " players." + msgObj.msgType)
+        broadcastWs(response);
+        // expressWs.getWss().clients.forEach(player_socket => {
+        //     player_socket.send(JSON.stringify(response))
+        //   });
+
+
+    });
+});
+
 app.get('/', (req, res) => {
     const { email } = req.session
     console.log(email);
     res.render('index', {
         email: email
-    })  
-}) 
-  
+    })
+})
+
 app.get('/home', redirectLogin, async (req, res) => {
     const { email } = req.session
     console.log(email);
@@ -172,17 +180,17 @@ app.get('/login', redirectHome, (req, res) => {
     </form>
     <a href='/register'>Register</a>
     `)
-}) 
+})
 
 app.get('/board', async (req, res) => {
     if (!req.session.email) {
         res.redirect('/login')
     }
-   
+
     let data = await fs.promises.readFile('monopoly.json');
     let parsed_data = JSON.parse(data);
     res.render('board', {
-        tiles: parsed_data['tiles'],email:req.session.email
+        tiles: parsed_data['tiles'], email: req.session.email
     })
     console.log("Boardx")
 })
@@ -201,8 +209,8 @@ app.get('/register', redirectHome, (req, res) => {
     <a href='/login'>Login</a>
     `)
 })
-   
-  
+
+
 app.post('/login', redirectHome, async (req, res, next) => {
     try {
         console.log("LOGIN")
@@ -214,7 +222,7 @@ app.post('/login', redirectHome, async (req, res, next) => {
             return res.send({
                 message: "Invalid email or password"
             })
-        } 
+        }
         console.log(obj);
         const isValidPassword = compareSync(password, obj.password);
         if (isValidPassword) {
@@ -225,7 +233,7 @@ app.post('/login', redirectHome, async (req, res, next) => {
             console.log(req.session.email);
             return res.redirect('/home');
         } else {
-            res.send( 
+            res.send(
                 "Invalid email or password"
             );
             return res.redirect('/login')
@@ -273,7 +281,7 @@ app.post('/register', redirectHome, async (req, res, next) => {
         //     res.redirect('/register');
 
         // });
-      
+
         res.redirect('/home')
 
 
@@ -306,7 +314,7 @@ app.listen(PORT, () => { console.log(`server is listening on ${PORT}`) });
 function getContext(id) {
     return { name: 'great', orientation: '180deg', group: 'red' }
 }
-  
+
 hbs.registerHelper("get_property", function (id) {
     return "tile name='greatestever' group=green orientation=90deg"
 });
@@ -315,58 +323,38 @@ hbs.registerHelper("getHouseCount", function (id) {
 });
 hbs.registerHelper("firstHouse", function (id) {
     let property = game.get_property(id);
-    if (id) return property.house_count >=1 && property.house_count <5
+    if (id) return property.house_count >= 1 && property.house_count < 5
     return false
 });
 hbs.registerHelper("secondHouse", function (id) {
     let property = game.get_property(id);
-    if (id) return property.house_count >=2 && property.house_count <5
+    if (id) return property.house_count >= 2 && property.house_count < 5
     return false
 });
 hbs.registerHelper("thirdHouse", function (id) {
     let property = game.get_property(id);
-    if (id) return property.house_count >=3 && property.house_count <5
+    if (id) return property.house_count >= 3 && property.house_count < 5
     return false
-}); 
+});
 hbs.registerHelper("fourthHouse", function (id) {
     let property = game.get_property(id);
-    if (id) return property.house_count >=4 && property.house_count <5
-    return false 
+    if (id) return property.house_count >= 4 && property.house_count < 5
+    return false
 });
 hbs.registerHelper("hotel", function (id) {
-    let property = game.get_property(id); 
-    if (id) return property.house_count == 5 
+    let property = game.get_property(id);
+    if (id) return property.house_count == 5
     return false
 });
 hbs.registerHelper("mortgageColor", function (id) {
-    let property = game.get_property(id); 
+    let property = game.get_property(id);
     if (id) return property.is_mortgaged() ? "red" : "blue";
     return "white"
-}); 
+});
 
 
-// function processPlayer(player) {
-//     let player_idx=game.get_player_idx(player);
-//     if (game.in_jail(player)){
-
-//     }
-//     //If player is in jail then ask if they want to pay or roll
-//     //If not pay then roll for double {
-//         //If double then move
-//     //}
-//     //else If pay then allow move {
-//     let move=rollDice();
-//     //}
 
 
-//     game.move_by(player,move);
-//     // Get property player is on
-//     //If property is available start bidding subfunction
-//     //If property is owned... trigger rent pay
-//     //If property is a function then do the function.
-//     jsonMsg = "Do something message for player"
-//     player_sockets[player_idx].send(jsonMsg);
- 
 // }
 function start_game() {
     console.log("Starting Game")

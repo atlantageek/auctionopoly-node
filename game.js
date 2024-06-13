@@ -115,6 +115,7 @@ class Game {
     player_wallets = [];
     player_in_jail = [];
     player_states=[];//NOTREADY,WAITING,ROLLREADY,DOSOMETHING
+    auction_timeout=null;
     _property_id_under_auction=null;
     winning_bid=null;
     winning_player=null;
@@ -139,6 +140,24 @@ class Game {
         return this.winning_player
     }
     constructor() {
+    }
+    toJSON() {
+        return {
+            player_names:this.player_names,
+            player_list:this.player_list,
+            player_positions:this.player_positions,
+            player_wallets:this.player_wallets,
+            player_in_jail:this.player_in_jail,
+            player_states:this.player_states,
+            winning_bid:this._winning_bid,
+            winning_player:this._winning_player,
+            board:this.board,
+            reward:this.reward,
+            risk:this.risk,
+            game_running:this.game_running,
+            current_player:this.current_player,
+            next_bid:this.next_bid
+        }
     }
     async initialize() {
         try {
@@ -215,6 +234,11 @@ class Game {
         this.next_bid=this.winning_bid+10;
         console.log('PROPERTY bid' + this.winning_bid)
         console.log('PROPERTY being auction' + JSON.stringify(this._property_id_under_auction))
+        this.auction_timeout=setTimeout(() => {
+            console.log("Closing Auction.")
+            this.close_auction();
+            
+        },6000)
         return true;
 
     }
@@ -226,6 +250,7 @@ class Game {
         this.winning_player=player;
         this.winning_bid=bid;
         this.next_bid=this.winning_bid+10;
+        this.auction_timeout.refresh();console.log("Refresh timeout")
         return true
     }
     close_auction() {
@@ -239,7 +264,7 @@ class Game {
         this.winning_bid=null;
         this.winning_player=null;
         this.next_bid=0
-
+        this.set_player_state(this.get_current_player(),'DOSIMETHING')
         return true;
         
     }
