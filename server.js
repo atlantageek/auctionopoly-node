@@ -116,7 +116,7 @@ app.ws('/ws', function (ws, req) {
 
         console.log(req.session.email);
         let response = null;
-
+        game.end_auction_callback=end_auction;
         response = SM.process_message(game, msgObj, req.session.email);
         
         
@@ -310,6 +310,14 @@ app.post('/logout', redirectLogin, (req, res) => {
 
 app.listen(PORT, () => { console.log(`server is listening on ${PORT}`) });
 
+function end_auction() {
+    console.log("END AUCTION CALLBACK.")
+    game.close_auction();
+    var response={msgType:'DOSOMETHING',gamestate:game,player:game.current_player}
+    
+    broadcastWs(response)
+
+}
 
 function getContext(id) {
     return { name: 'great', orientation: '180deg', group: 'red' }
