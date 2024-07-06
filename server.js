@@ -120,6 +120,7 @@ app.ws('/ws', function (ws, req) {
         response = SM.process_message(game, msgObj, req.session.email);
         
         
+        
         //If The response is register accepted then we need to add clients socket to the player list.
         if (response.msgType == 'REGISTER_ACCEPT') {
             console.log("Socket push.")

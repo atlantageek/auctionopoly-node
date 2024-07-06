@@ -41,7 +41,7 @@ function process_player_move(game,player,roll=rollDice()) {
     console.log(roll);
     //Need to check the roll for doubles and handle accordingly
     let move=roll.val;
-    let pos = game.move_by(player,move);
+    let pos = game.do_move(player,move);
     console.log("Position " + pos);
     let property = game.board[pos];
     console.log(property.ownable)
@@ -55,10 +55,24 @@ function process_player_move(game,player,roll=rollDice()) {
         //Set all players to BIDDING
         game.start_auction(property.id);
         var response = {msgType:'AUCTION',gamestate:game, player:player,roll:roll,current_bid:0,next_bid:property.mortgage_value, property:property.id, winning_player:null}
-        
-        
         return response;
-
+    }
+    else if (property.ownable ) //Property is owned.  Please update
+    {
+        console.log("CHARGING RENT")
+        let rent=game.get_rent(property.id,roll.val)
+        game.charge_player(player,rent);
+        game.pay_owner(property.id, rent);
+    }
+    else if (!property.ownable) {
+        console.log("Property not ownable" + property.id)
+        // let property = this.get_property(property.id)
+        // if (property.id == 'incometax' ) {
+        //     game.charge_player(player,200);
+        // }
+        // else if (property.id == 'luxerytax') {
+        //     game.charge_player(player,100);
+        // }
     }
     var response={msgType:'DOSOMETHING',gamestate:game,player:player,roll:roll}
     return response;

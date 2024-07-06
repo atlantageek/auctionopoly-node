@@ -256,7 +256,7 @@ class Game {
         this._property_id_under_auction=null;
         
         property.owned_by=this.winning_player;
-        this.charge_winner(this.winning_player,this.winning_bid);
+        this.charge_player(this.winning_player,this.winning_bid);
         this._property_id_under_auction=null;
         this.winning_bid=null;
         this.winning_player=null;
@@ -356,6 +356,11 @@ class Game {
         let owner_cnt = this.count_group_ownership(owner, property.group);
         return property.current_rent(owner_cnt, roll)
     }
+    pay_owner(property_id,amount) {
+        let property = this.get_property(property_id)
+        let owner=property.owned_by;
+        this.pay_player(owner,amount);
+    }
     //Used to calculate rent for Utilities and Railroads
     count_group_ownership(player_id, group_name) {
         return this.get_ids_by_group(group_name).reduce((cnt, property_id) => {
@@ -419,18 +424,25 @@ class Game {
         return result;
     }
     roll_player_die(player_id, die_count) {
+        console.log("ROll Player Die");
         let move_count = this.roll_die(die_count);
-        let property_id = this.move_by(player_id, move_count)
+        //let property_id = this.move_by(player_id, move_count)
+        let property_id = this.do_move(player_id, move_count);
         return property_id;
     }
     get_wallet(player_id) {
         let player_idx = this.get_player_idx(player_id);
         return this.player_wallets[player_idx]
     }
-    charge_winner(player_id,amount) {
+    charge_player(player_id,amount) {
         let player_idx = this.get_player_idx(player_id);
         return this.player_wallets[player_idx]-=amount;
     }
+    pay_player(player_id,amount) {
+        let player_idx = this.get_player_idx(player_id);
+        return this.player_wallets[player_idx]+=amount;
+    }
+
     in_jail(player_id) {
         let player_idx = this.get_player_idx(player_id);
         return this.player_in_jail[player_idx]
@@ -505,8 +517,9 @@ class Game {
         let property_id = this.board[pos].id;
         if (property_id == 'gotojail') {
             this.send_player_to_jail(player_id)
-            return;
+            return 10;
         }
+        return pos;
 
         // if (property_id=='risk'){
         //     return;
