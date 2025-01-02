@@ -344,6 +344,10 @@ describe('#game()', function () {
 
       result = game.start_auction('mediterraneanave')
       expect(result).to.equal(false);
+
+
+      game.end_auction_callback = () => {return true}
+      expect(game.end_auction_callback(),true)
       result = game.start_auction('balticave')
       expect(result).to.equal(true);
       expect(30).to.equal(game.winning_bid)
@@ -354,6 +358,7 @@ describe('#game()', function () {
       game.set_players("a","b","c","d");
       var b_wallet=game.get_wallet('b')
       expect(1500).to.equal(b_wallet);
+      game.end_auction_callback = () => {return true}
       var result = game.start_auction('orientalave')
       expect(50).to.equal(game.winning_bid);
       expect(false).to.equal(game.bid_auction(40,'a'))

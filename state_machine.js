@@ -53,6 +53,7 @@ function process_player_move(game,player,roll=rollDice()) {
         
         console.log("This property should be going up for auction.")
         //Set all players to BIDDING
+        game.end_auction_callback = () => {return true}
         game.start_auction(property.id);
         var response = {msgType:'AUCTION',gamestate:game, player:player,roll:roll,current_bid:0,next_bid:property.mortgage_value, property:property.id, winning_player:null}
         return response;
@@ -66,13 +67,13 @@ function process_player_move(game,player,roll=rollDice()) {
     }
     else if (!property.ownable) {
         console.log("Property not ownable" + property.id)
-        // let property = this.get_property(property.id)
-        // if (property.id == 'incometax' ) {
-        //     game.charge_player(player,200);
-        // }
-        // else if (property.id == 'luxerytax') {
-        //     game.charge_player(player,100);
-        // }
+        //let property = this.get_property(property.id)
+        if (property.id == 'incometax' ) {
+            game.charge_player(player,200);
+        }
+        else if (property.id == 'luxerytax') {
+            game.charge_player(player,100);
+        }
     }
     var response={msgType:'DOSOMETHING',gamestate:game,player:player,roll:roll}
     return response;
@@ -121,7 +122,7 @@ const process_message=(game,msgObj,player)=>{
             if (!game.auction_active()) throw new Error('No bidding on inactive auction.')
             var bid = game.next_bid;
             game.bid_auction(bid,msgObj.bidder)
-            var response = {msgType:'AUCTION',gamestate:game, player:player}
+            var response = {msgType:'AUCTION',gamestate:game, player:player,winner: msgObj.bidder}
             //NO RESPONSE being sent here... very annoying
 
 

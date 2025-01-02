@@ -116,7 +116,7 @@ app.ws('/ws', function (ws, req) {
 
         console.log(req.session.email);
         let response = null;
-        game.end_auction_callback=end_auction;
+        game.end_auction_callback=end_auction;//this callback should broadcast a new websocket response.
         response = SM.process_message(game, msgObj, req.session.email);
         
         

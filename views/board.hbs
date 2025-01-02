@@ -56,10 +56,11 @@
     let current_bid=0;
     let next_bid=0;
     let auction_countdown=0;
+    let current_player='{{email}}'
     let auction_interval=null;
         function init() {
             console.log("LOADED")
-            $(".balticave .secondhouse").css("vFisibility", "visible");
+            $(".balticave .secondhouse").css("visibility", "visible");
             $("#iam").text('{{email}}')
             const socketProtocol = (window.location.protocol === 'https:' ? 'wss:' : 'ws:')
             const echoSocketUrl = socketProtocol + '//' + window.location.hostname + ':' + window.location.port + '/ws'
@@ -73,8 +74,8 @@
             ws.addEventListener('message', (msg) => {
                 let obj = JSON.parse(msg.data);
                 let gamestate=obj.gamestate;
-                let player_id='{{email}}';
-                let player_idx=gamestate.player_list.findIndex(p=>p==player_id);
+  
+                let player_idx=gamestate.player_list.findIndex(p=>p==current_player);
                 
                 let player_state=gamestate.player_states[player_idx];
                 console.log("PLAYER STATE: + " + player_state + " Msg Type: " + obj.msgType)
@@ -90,17 +91,16 @@
                         }
                         else {
                             auction_countdown -=1;
-                            $("#bidding_timer").text(''+auction_countdown + " seconds",true);
+                            $("#bidding_timer").text(''+auction_countdown + " seconds:" ,true);
                         }
                     },1000);
                      $("#bidding_button").prop('disabled',true);
                      current_bid=gamestate.current_bid || 0;
                      next_bid=gamestate.next_bid;
-                     populatePlayerStatus('AUCTION',gamestate);
-                     console.log('BID SETUP: ' + this.current_bid + " , " + this.next_bid);
+                     populatePlayerStatus('AUCTION',gamestate,obj);
                 }
                 else  {
-                    populatePlayerStatus(player_state,gamestate);
+                    populatePlayerStatus(player_state,gamestate,null);
                     populateDice(obj)
                 }
                
@@ -138,7 +138,7 @@
                 $('#die2').text(dice['die2'])
             }
         }
-        function populatePlayerStatus(mode,gamestate) {
+        function populatePlayerStatus(mode,gamestate,orig_msg=null) {
             console.log("USING STATE: " + mode)
                     $("#current_bid").text('');
                     $("#next_bid").text('');
@@ -172,7 +172,10 @@
                     $("#start_game_button").prop('disabled',true);
                     $("#roll_button").prop('disabled',true);
                     $("#done_button").prop('disabled',true);
-                    $("#bidding_button").prop('disabled',false);
+                    if (current_player == orig_msg.winner) 
+                        $("#bidding_button").prop('disabled',true);
+                    else 
+                        $("#bidding_button").prop('disabled',false);
                     $("#current_bid").text(gamestate.current_bid);
                     $("#next_bid").text(gamestate.next_bid);
                     $("#winning_player").text(gamestate.winning_player)
@@ -362,7 +365,7 @@
             <div id="player2" class="player_details" ><div class="name">Player2</div><div class="account"></div></div>
             <div id="player3" class="player_details"><div class="name">Player3</div><div class="account"></div></div>
             <div id="player4" class="player_details"><div class="name">Player4</div><div class="account"></div></div>
-            <div ><span id="die1">C</span>/<span id="die2">D</span></div>
+            <div ><span id="die1"></span>/<span id="die2"></span></div>
             <button id="start_game_button" onclick="start_game()">Ready</button>
             <button id="roll_button" onclick="roll()" disabled>Roll</button>
             <button id="done_button" onclick="done()" disabled>Done</button>

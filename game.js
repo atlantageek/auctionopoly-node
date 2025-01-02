@@ -235,7 +235,10 @@ class Game {
         this.next_bid=this.winning_bid+10;
         console.log('PROPERTY bid' + this.winning_bid)
         console.log('PROPERTY being auction' + JSON.stringify(this._property_id_under_auction))
-        this.auction_timeout=setTimeout(this.end_auction_callback, 6000)
+        this.auction_timeout=setTimeout(()=>{
+            console.log("Calling End Auction callback.")
+            this.end_auction_callback()
+        }, 6000)
         return true;
 
     }

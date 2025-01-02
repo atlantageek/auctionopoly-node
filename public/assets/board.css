@@ -66,17 +66,22 @@ body {
 }
 .player_details .account {
   padding:10px;
+  font-size:20px;
 }
 div#player1 .name {
   color:lightgreen;
+  font-size:20px;
 
 }
 div#player2 .name {
   color:lightblue;
+  font-size:20px;
 }
 div#player3 .name {
   color:pink;
+  font-size:20px;
 }
 div#player4 .name {
   color:yellow;
+  font-size:20px;
 }
